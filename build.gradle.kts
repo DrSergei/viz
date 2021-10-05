@@ -35,6 +35,7 @@ if (project.hasProperty("skiko.version")) {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.3")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.1")

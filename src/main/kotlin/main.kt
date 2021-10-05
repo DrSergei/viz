@@ -1,13 +1,17 @@
 // Импорт
 import kotlin.system.*
 import pieChart.*
+import cli.*
 
-fun main() {
-    val time = measureTimeMillis {
-        createWindowPieChart("PieChart")
+fun main(args : Array<String>) {
+    try {
+        val time = measureTimeMillis {
+            prepareArgs(args)
+        }
+        println("$time")
+    } catch (e: Exception) {
+        println("Error")
     }
-    println("$time")
-
 }
 
 
