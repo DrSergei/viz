@@ -1,6 +1,5 @@
 // Импорт
 import kotlin.system.*
-import pieChart.*
 import cli.*
 
 fun main(args : Array<String>) {

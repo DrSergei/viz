@@ -16,7 +16,8 @@ import kotlinx.cli.*
  * Кодируют основные представления данных.
  */
 enum class Mode {
-    PieCharts // круговая диаграмм
+    PIE_CHART, // круговая диаграмм
+    HISTOGRAM // гистограмма
 }
 
 /**
@@ -26,13 +27,11 @@ enum class Mode {
  */
 fun prepareArgs(args: Array<String>) {
     try {
-        val parser = ArgParser("kvdb")
+        val parser = ArgParser("")
         val input by parser.option(ArgType.String, shortName = "i", description = "Input file(csv file)").required()
-        val mode by parser.option(ArgType.Choice<Mode>(), shortName = "m", description = "Operating mode").default(Mode.PieCharts)
+        val mode by parser.option(ArgType.Choice<Mode>(), shortName = "m", description = "Operating mode").default(Mode.PIE_CHART)
         parser.parse(args)
-        when (mode) {
-            Mode.PieCharts -> input(input, mode)
-        }
+        input(input, mode)
     } catch (e: Exception) {
         println("Error")
     }

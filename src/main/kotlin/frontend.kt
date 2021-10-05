@@ -9,6 +9,8 @@ package frontend
 import cli.*
 import java.io.*
 import pieChart.*
+import histogram.*
+import graphics.*
 
 /**
  * Служебная функция.
@@ -40,7 +42,8 @@ fun checkFile(file: File): Boolean {
 fun distributionInput(data : MutableList<Mark>, vararg modes : Mode) {
     for (mode in modes) {
         when (mode) {
-            Mode.PieCharts -> createWindowPieChart("PieChart", data)
+            Mode.PIE_CHART -> createWindowPieChart("PieChart", data)
+            Mode.HISTOGRAM -> createWindowHistogram("Histogram", data)
         }
     }
 }
@@ -57,7 +60,7 @@ fun input(fileName: String, mode : Mode) {
         val data = mutableListOf<Mark>()
         buffer.map {
             val line = it.split(";")
-            data.add(Mark(Pair(line[0].toFloat(), line[0])))
+            data.add(Mark(Pair(line[0].toFloat(), line[1])))
         }
         distributionInput(data, mode)
     }

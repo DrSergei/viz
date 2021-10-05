@@ -9,14 +9,13 @@ import org.jetbrains.skija.Font
 import org.jetbrains.skija.Paint
 import org.jetbrains.skiko.*
 import java.awt.*
-import java.awt.event.*
 import kotlin.math.*
 import kotlin.random.*
 import kotlin.time.*
 import javax.swing.*
 import graphics.*
-
-data class Mark(val value: Pair<Float, String>)
+import graphics.MouseAdapter
+import graphics.MouseMotionAdapter
 
 fun createWindowPieChart(title: String, data : List<Mark>) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
@@ -56,6 +55,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val data : List<Mar
         canvas.scale(contentScale, contentScale)
         val w = (width / contentScale).toInt()
         val h = (height / contentScale).toInt()
+        font.size = h.toFloat() / 2 / data.size - 1
 
         val centerX = w.toFloat() * 3 / 8
         val centerY = h.toFloat() / 2
@@ -69,8 +69,8 @@ class RendererPieChart(private val layer: SkiaLayer, private val data : List<Mar
     private fun displayLegendPieChart(canvas: Canvas, rect : Rect) {
         canvas.drawRect(rect, stroke)
         for (index in data.indices) {
-            canvas.drawString(data[index].value.second, rect.left, rect.top + (2*index + 1) * (rect.bottom - rect.top) / 10, font, paint(index))
-            canvas.drawString((data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 100).toInt().toString() + "%", rect.left, rect.top + (2*index + 2) * (rect.bottom - rect.top) / 10, font, paint(index))
+            canvas.drawString(data[index].value.second, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
+            canvas.drawString((data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 100).toInt().toString() + "%", rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
     }
 
@@ -86,7 +86,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val data : List<Mar
         // сектора
         var angle = 0f
         for (index in data.indices) {
-            canvas.drawArc(pieChartRect._left,pieChartRect._top,pieChartRect._right,pieChartRect._bottom, angle, data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 360, true, paint(index))
+            canvas.drawArc(pieChartRect.left,pieChartRect.top,pieChartRect.right,pieChartRect.bottom, angle, data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 360, true, paint(index))
             angle += data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 360
         }
 
@@ -97,27 +97,41 @@ class RendererPieChart(private val layer: SkiaLayer, private val data : List<Mar
             angle += data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 360
         }
 
+        // подсказки
+        if (distance(State.mouseX, State.mouseY, centerX, centerY) < pieChartRadius) {
+            angle = 0f
+            for (index in data.indices) {
+                angle += data[index].value.first / (data.sumOf { it.value.first.toDouble() }).toFloat() * 360
+                if (State.mouseX > centerX && State.mouseY > centerY) {
+                    val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
+                    if ((tg < tan(angle / 180 * PI) || angle >= 90) && angle > 0) {
+                        canvas.drawString(data[index].value.second, State.mouseX, State.mouseY, font, stroke)
+                        break
+                    }
+                }
+                if (State.mouseX < centerX && State.mouseY > centerY) {
+                    val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
+                    if ((tg < tan(angle / 180 * PI) || angle >= 180) && angle > 90) {
+                        canvas.drawString(data[index].value.second, State.mouseX, State.mouseY, font, stroke)
+                        break
+                    }
+                }
+                if (State.mouseX < centerX && State.mouseY < centerY) {
+                    val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
+                    if ((tg < tan(angle / 180 * PI) || angle >= 270) && angle > 180) {
+                        canvas.drawString(data[index].value.second, State.mouseX, State.mouseY, font, stroke)
+                        break
+                    }
+                }
+                if (State.mouseX > centerX && State.mouseY < centerY) {
+                    val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
+                    if ((tg < tan(angle / 180 * PI) || angle >= 360) && angle > 270) {
+                        canvas.drawString(data[index].value.second, State.mouseX, State.mouseY, font, stroke)
+                        break
+                    }
+                }
+            }
+        }
     }
 }
 
-object MouseMotionAdapter : java.awt.event.MouseMotionAdapter() {
-    override fun mouseMoved(event: MouseEvent) {
-        State.mouseX = event.x.toFloat()
-        State.mouseY = event.y.toFloat()
-    }
-}
-
-object State {
-    var mouseX = 0f
-    var mouseY = 0f
-}
-
-object MouseAdapter : java.awt.event.MouseAdapter() {
-    override fun mouseClicked(event: MouseEvent) {
-        Click.click = true
-    }
-}
-
-object Click {
-    var click = false
-}
