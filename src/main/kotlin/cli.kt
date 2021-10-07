@@ -17,7 +17,8 @@ import kotlinx.cli.*
  */
 enum class Mode {
     PIE_CHART, // круговая диаграмм
-    HISTOGRAM // гистограмма
+    HISTOGRAM, // гистограмма
+    LINE_CHART // линейная диаграмма
 }
 
 /**
@@ -30,8 +31,9 @@ fun prepareArgs(args: Array<String>) {
         val parser = ArgParser("")
         val input by parser.option(ArgType.String, shortName = "i", description = "Input file(csv file)").required()
         val mode by parser.option(ArgType.Choice<Mode>(), shortName = "m", description = "Operating mode").default(Mode.PIE_CHART)
+        val delimiter by parser.option(ArgType.String, shortName = "d", description = "Delimiter").default(";")
         parser.parse(args)
-        input(input, mode)
+        input(input, mode, delimiter)
     } catch (e: Exception) {
         println("Error")
     }

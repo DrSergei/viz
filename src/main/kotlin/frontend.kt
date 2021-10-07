@@ -10,7 +10,7 @@ import cli.*
 import java.io.*
 import pieChart.*
 import histogram.*
-import graphics.*
+import table.*
 
 /**
  * Служебная функция.
@@ -39,11 +39,12 @@ fun checkFile(file: File): Boolean {
  *
  * Выбирает нужный обработчик для каждой операции с учетом режима работы.
  */
-fun distributionInput(data : MutableList<Mark>, vararg modes : Mode) {
+fun distributionInput(table: Table, vararg modes : Mode) {
     for (mode in modes) {
         when (mode) {
-            Mode.PIE_CHART -> createWindowPieChart("PieChart", data)
-            Mode.HISTOGRAM -> createWindowHistogram("Histogram", data)
+            Mode.PIE_CHART -> createWindowPieChart("PieChart", table.getVector(0))
+            Mode.HISTOGRAM -> createWindowHistogram("Histogram", table.getVector(0))
+            Mode.LINE_CHART -> createWindowLineChart("LineChart", table.getVector(0))
         }
     }
 }
@@ -53,15 +54,11 @@ fun distributionInput(data : MutableList<Mark>, vararg modes : Mode) {
  *
  * Работа с вводом.
  */
-fun input(fileName: String, mode : Mode) {
+fun input(fileName: String, mode : Mode, delimiter: String) {
     val dataFile = File(fileName)
     if (checkFile(dataFile)) {
         val buffer = dataFile.readLines()
-        val data = mutableListOf<Mark>()
-        buffer.map {
-            val line = it.split(";")
-            data.add(Mark(Pair(line[0].toFloat(), line[1])))
-        }
-        distributionInput(data, mode)
+        val table = parser(buffer, delimiter)
+        distributionInput(table, mode)
     }
 }

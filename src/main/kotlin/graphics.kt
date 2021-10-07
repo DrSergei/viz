@@ -5,8 +5,6 @@ package graphics
 import java.awt.event.*
 import kotlin.math.*
 
-data class Mark(val value: Pair<Float, String>)
-
 fun distance(x1: Float, y1: Float, x2: Float, y2: Float) = sqrt((x1 - x2) * (x1 - x2) + (y1 - y2)  * (y1 - y2))
 
 object MouseMotionAdapter : java.awt.event.MouseMotionAdapter() {
