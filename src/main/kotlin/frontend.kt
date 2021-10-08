@@ -65,7 +65,8 @@ val handlers = mapOf(
  *
  * Выбирает нужный обработчик для каждой операции с учетом режима работы.
  */
-fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) = handlers[mode]?.invoke(table, columns, outputFile)
+fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) =
+    handlers[mode]?.invoke(table, columns, outputFile)
 
 /**
  * Служебная функция.

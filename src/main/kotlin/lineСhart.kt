@@ -30,7 +30,7 @@ fun createWindowLineChart(title: String, vector: Vector) = runBlocking(Dispatche
     window.layer.addMouseListener(MouseAdapter)
 
     window.preferredSize = Dimension(800, 600)
-    window.minimumSize = Dimension(100,100)
+    window.minimumSize = Dimension(100, 100)
     window.pack()
     window.layer.awaitRedraw()
     window.isVisible = true
@@ -44,7 +44,7 @@ fun saveLineChart(vector: Vector, outputFile: String) {
     File(outputFile).writeBytes(data!!.bytes)
 }
 
-class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector): SkiaRenderer {
+class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector) : SkiaRenderer {
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 40f)
     private val stroke = Paint().apply {
@@ -53,7 +53,7 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         strokeWidth = 2.5f
     }
 
-    private fun paint(number : Int) : Paint {
+    private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
 
@@ -81,19 +81,33 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
         vector.data.indices.forEach { index ->
-            canvas.drawString(vector.getMark(index).getObject(), rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
-            canvas.drawString(vector.getMark(index).getData().toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
+            canvas.drawString(
+                vector.getMark(index).getObject(),
+                rect.left,
+                rect.top + (2 * index + 1) * font.size,
+                font,
+                paint(index)
+            )
+            canvas.drawString(
+                vector.getMark(index).getData().toString(),
+                rect.left,
+                rect.top + (2 * index + 2) * font.size,
+                font,
+                paint(index)
+            )
         }
     }
 
-    private fun displayLineChart(canvas: Canvas, centerX: Float, centerY: Float, lineChartRadius : Float ) {
+    private fun displayLineChart(canvas: Canvas, centerX: Float, centerY: Float, lineChartRadius: Float) {
         // координаты
         val x = centerX - lineChartRadius
         val y = centerY - lineChartRadius
 
         // поле рисования
         val lineChartRect = Rect.makeXYWH(x, y, lineChartRadius * 2, lineChartRadius * 2)
-        val top = (vector.data.maxOf { it.getData() }.toInt().toString().dropLast(vector.data.maxOf { it.getData() }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.getData() }.toInt().toString().length - 1)
+        val top = (vector.data.maxOf { it.getData() }.toInt().toString()
+            .dropLast(vector.data.maxOf { it.getData() }.toInt().toString().length - 1).toInt() + 1) * 10.toDouble()
+            .pow(vector.data.maxOf { it.getData() }.toInt().toString().length - 1)
 
         // Оси
         axis(canvas, lineChartRadius, x, y)
@@ -102,33 +116,49 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         pillars(canvas, lineChartRect, lineChartRadius, top.toFloat())
 
         // Разметка
-        captions(canvas, lineChartRadius,top.toFloat(), x,y)
+        captions(canvas, lineChartRadius, top.toFloat(), x, y)
 
         // подсказки
         hint(canvas, lineChartRect, lineChartRadius, top.toFloat())
     }
 
     private fun axis(canvas: Canvas, lineChartRadius: Float, x: Float, y: Float) {
-        canvas.drawLine(x, y + 2*lineChartRadius, x, y, stroke)
-        canvas.drawLine(x, y + 2*lineChartRadius, x + 2*lineChartRadius, y + 2*lineChartRadius, stroke)
+        canvas.drawLine(x, y + 2 * lineChartRadius, x, y, stroke)
+        canvas.drawLine(x, y + 2 * lineChartRadius, x + 2 * lineChartRadius, y + 2 * lineChartRadius, stroke)
         for (it in 0..10) {
-            canvas.drawLine(x + 2*lineChartRadius / 10 * it, y + 2*lineChartRadius, x + 2*lineChartRadius / 10 * it, y, stroke)
+            canvas.drawLine(
+                x + 2 * lineChartRadius / 10 * it,
+                y + 2 * lineChartRadius,
+                x + 2 * lineChartRadius / 10 * it,
+                y,
+                stroke
+            )
         }
     }
 
     private fun pillars(canvas: Canvas, lineChartRect: Rect, lineChartRadius: Float, top: Float) {
         vector.data.indices.forEach { index ->
-            canvas.drawRect(Rect(
-                lineChartRect.left + 3,
-                lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5,
-                (lineChartRect.right - lineChartRect.left) * vector.getMark(index).getData() / top + lineChartRect.left + 3,
-                lineChartRect.top + 2 * lineChartRadius / vector.data.size  * (index + 1)  - 5), paint(index))
+            canvas.drawRect(
+                Rect(
+                    lineChartRect.left + 3,
+                    lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size * index - 5,
+                    (lineChartRect.right - lineChartRect.left) * vector.getMark(index)
+                        .getData() / top + lineChartRect.left + 3,
+                    lineChartRect.top + 2 * lineChartRadius / vector.data.size * (index + 1) - 5
+                ), paint(index)
+            )
         }
     }
 
     private fun captions(canvas: Canvas, lineChartRadius: Float, top: Float, x: Float, y: Float) {
         for (it in 0..10) {
-            canvas.drawString("${top * it / 10}", x + 2*lineChartRadius / 10 * it - 15, y + 2*lineChartRadius + 20, font.setSize(font.size / 3), stroke)
+            canvas.drawString(
+                "${top * it / 10}",
+                x + 2 * lineChartRadius / 10 * it - 15,
+                y + 2 * lineChartRadius + 20,
+                font.setSize(font.size / 3),
+                stroke
+            )
             font.size = font.size * 3
         }
     }
@@ -136,9 +166,11 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
     private fun hint(canvas: Canvas, lineChartRect: Rect, lineChartRadius: Float, top: Float) {
         vector.data.indices.forEach { index ->
             if (State.mouseX >= lineChartRect.left + 3 &&
-                State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getMark(index).getData() / top + lineChartRect.left + 3 &&
-                State.mouseY >= lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5 &&
-                State.mouseY <= lineChartRect.top + 2 * lineChartRadius / vector.data.size  * (index + 1) - 5) {
+                State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getMark(index)
+                    .getData() / top + lineChartRect.left + 3 &&
+                State.mouseY >= lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size * index - 5 &&
+                State.mouseY <= lineChartRect.top + 2 * lineChartRadius / vector.data.size * (index + 1) - 5
+            ) {
                 canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                 return
             }
@@ -146,7 +178,7 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
     }
 
     // скрин графика
-    fun preview() : Image {
+    fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
         displayLineChart(canvas, 300f, 300f, 275f)

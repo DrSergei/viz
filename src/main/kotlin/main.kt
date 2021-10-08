@@ -3,7 +3,7 @@ import kotlin.system.*
 import cli.*
 import frontend.*
 
-fun main(args : Array<String>) {
+fun main(args: Array<String>) {
     try {
         val time = measureTimeMillis {
             val arguments = prepareArgs(args)
@@ -14,5 +14,3 @@ fun main(args : Array<String>) {
         println("Error")
     }
 }
-
-
