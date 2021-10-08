@@ -32,24 +32,27 @@ fun checkFile(file: File): Boolean {
 fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
-        createWindowPieChart(vector.getHead(), vector)
-        savePieChart(vector, outputFile)
+        val objects = table.getObjects()
+        createWindowPieChart(vector.getHead(), objects, vector)
+        savePieChart(objects, vector, outputFile)
     }
 }
 
 fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
-        createWindowHistogram(vector.getHead(), vector)
-        saveHistogram(vector, outputFile)
+        val objects = table.getObjects()
+        createWindowHistogram(vector.getHead(), objects, vector)
+        saveHistogram(objects, vector, outputFile)
     }
 }
 
 fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
-        createWindowLineChart(vector.getHead(), vector)
-        saveLineChart(vector, outputFile)
+        val objects = table.getObjects()
+        createWindowLineChart(vector.getHead(), objects, vector)
+        saveLineChart(objects,vector, outputFile)
     }
 }
 

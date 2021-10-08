@@ -5,28 +5,22 @@ data class Table(val headings: List<String>, val objects: List<String>, val data
 
     private fun getHeading(column: Int) = headings[column]
 
-    private fun getObject(row: Int) = objects[row]
+    fun getObjects() = Vector(getHeading(0), objects)
 
-    fun getVector(column: Int): Vector {
-        val heading = getHeading(column)
-        val buffer = mutableListOf<Mark>()
+    fun getVector(column: Int): Vector<Float> {
+        val heading = getHeading(column + 1)
+        val buffer = mutableListOf<Float>()
         data.indices.forEach { row ->
-            buffer.add(Mark(Pair(getObject(row), getData(row, column))))
+            buffer.add(getData(row, column))
         }
         return Vector(heading, buffer)
     }
 }
 
-data class Vector(val heading: String, val data: List<Mark>) {
+data class Vector<T>(val heading: String, val data: List<T>) {
     fun getHead() = heading
 
-    fun getMark(row: Int) = data[row]
-}
-
-data class Mark(val value: Pair<String, Float>) {
-    fun getObject() = value.first
-
-    fun getData() = value.second
+    fun getData(row: Int) = data[row]
 }
 
 fun parser(lines: List<String>, delimiter: String): Table {
