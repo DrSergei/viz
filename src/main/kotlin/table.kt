@@ -10,8 +10,9 @@ data class Table(val headings : List<String>, val objects : List<String>, val da
     fun getVector(column: Int) : Vector {
         val heading = getHeading(column)
         val buffer = mutableListOf<Mark>()
-        for (row in data.indices)
+        data.indices.forEach { row->
             buffer.add(Mark(Pair(getObject(row),getData(row, column))))
+        }
         return Vector(heading, buffer)
     }
 }
@@ -32,8 +33,8 @@ fun parser(lines : List<String>, delimiter : String) : Table {
         val headings = lines[0].split(delimiter)
         val objects = mutableListOf<String>()
         val data = mutableListOf<List<Float>>()
-        lines.drop(1).map {
-            val buffer = it.split(delimiter)
+        lines.drop(1).forEach { line ->
+            val buffer = line.split(delimiter)
             objects.add(buffer.first())
             data.add(buffer.drop(1).map { it.toFloat() })
         }

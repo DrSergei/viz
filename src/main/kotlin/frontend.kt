@@ -34,31 +34,51 @@ fun checkFile(file: File): Boolean {
     return true
 }
 
+fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
+    columns.forEach {
+        val vector = table.getVector(it)
+        createWindowPieChart(vector.heading, vector)
+    }
+}
+
+fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
+    columns.forEach {
+        val vector = table.getVector(it)
+        createWindowHistogram(vector.heading, vector)
+    }
+}
+
+fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
+    columns.forEach {
+        val vector = table.getVector(it)
+        createWindowLineChart(vector.heading, vector)
+    }
+}
+
+val handlers = mapOf(
+    Mode.PIE_CHART to ::handlerPieChart,
+    Mode.HISTOGRAM to ::handlerHistogram,
+    Mode.LINE_CHART to ::handlerLineChart
+)
+
+
 /**
  * Служебная функция.
  *
  * Выбирает нужный обработчик для каждой операции с учетом режима работы.
  */
-fun distributionInput(table: Table, vararg modes : Mode) {
-    for (mode in modes) {
-        when (mode) {
-            Mode.PIE_CHART -> createWindowPieChart("PieChart", table.getVector(0))
-            Mode.HISTOGRAM -> createWindowHistogram("Histogram", table.getVector(0))
-            Mode.LINE_CHART -> createWindowLineChart("LineChart", table.getVector(0))
-        }
-    }
-}
+fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) = handlers[mode]?.invoke(table, columns, outputFile)
 
 /**
  * Служебная функция.
  *
  * Работа с вводом.
  */
-fun input(fileName: String, mode : Mode, delimiter: String) {
-    val dataFile = File(fileName)
-    if (checkFile(dataFile)) {
-        val buffer = dataFile.readLines()
-        val table = parser(buffer, delimiter)
-        distributionInput(table, mode)
+fun input(arguments: Arguments) {
+    val file = File(arguments.inputFile)
+    if (checkFile(file)) {
+        val buffer = file.readLines()
+        val table = parser(buffer, arguments.delimiter)
+        distributionInput(table, arguments.mode, arguments.columns, arguments.outputFile)
     }
 }

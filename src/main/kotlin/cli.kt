@@ -9,6 +9,7 @@ package cli
 import frontend.*
 import kotlinx.cli.*
 
+data class Arguments(val inputFile: String, val delimiter: String, val mode: Mode, val outputFile: String, val columns: List<Int>)
 
 /**
  * Типы диаграмм.
@@ -26,15 +27,18 @@ enum class Mode {
  *
  * Обрабатывает аргументы командной строки и выбирает сценарий работы.
  */
-fun prepareArgs(args: Array<String>) {
+fun prepareArgs(args: Array<String>) : Arguments {
     try {
         val parser = ArgParser("")
-        val input by parser.option(ArgType.String, shortName = "i", description = "Input file(csv file)").required()
-        val mode by parser.option(ArgType.Choice<Mode>(), shortName = "m", description = "Operating mode").default(Mode.PIE_CHART)
+        val inputFile by parser.option(ArgType.String, shortName = "i", fullName = "input", description = "Input file(csv file)").required()
         val delimiter by parser.option(ArgType.String, shortName = "d", description = "Delimiter").default(";")
+        val outputFile by parser.option(ArgType.String, shortName = "o", fullName = "output", description = "Output file(png file)").default("")
+        val mode by parser.option(ArgType.Choice<Mode>(),shortName = "m", fullName = "mode", description = "Working mode").required()
+        val columns by parser.argument(ArgType.Int).vararg()
         parser.parse(args)
-        input(input, mode, delimiter)
+        return Arguments(inputFile, delimiter, mode, outputFile, columns)
     } catch (e: Exception) {
-        println("Error")
+        println(e.message)
+        throw e
     }
 }
