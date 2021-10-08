@@ -16,7 +16,9 @@ import javax.swing.*
 import graphics.*
 import graphics.MouseAdapter
 import graphics.MouseMotionAdapter
+import org.jetbrains.skija.Image
 import table.*
+import java.io.*
 
 fun createWindowLineChart(title: String, vector: Vector) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
@@ -32,6 +34,14 @@ fun createWindowLineChart(title: String, vector: Vector) = runBlocking(Dispatche
     window.pack()
     window.layer.awaitRedraw()
     window.isVisible = true
+}
+
+fun saveLineChart(vector: Vector, outputFile: String) {
+    val window = SkiaWindow()
+    val renderer = RendererLineChart(window.layer, vector)
+    val image = renderer.preview()
+    val data = image.encodeToData(EncodedImageFormat.PNG)
+    File(outputFile).writeBytes(data!!.bytes)
 }
 
 class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector): SkiaRenderer {
@@ -63,13 +73,14 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         val lineChartRadius = min(centerX, centerY) - 25
 
         displayLineChart(canvas, centerX, centerY, lineChartRadius)
-        displayLegendLineChart(canvas, Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat()))
+        displayLegendLineChart(canvas, w, h)
         layer.needRedraw()
     }
 
-    private fun displayLegendLineChart(canvas: Canvas, rect : Rect) {
+    private fun displayLegendLineChart(canvas: Canvas, w: Int, h: Int) {
+        val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             canvas.drawString(vector.getMark(index).value.first, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
             canvas.drawString(vector.getMark(index).value.second.toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
@@ -85,7 +96,7 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         val top = (vector.data.maxOf { it.value.second }.toInt().toString().dropLast(vector.data.maxOf { it.value.second }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.value.second }.toInt().toString().length - 1)
 
         // столбцы
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(
                 lineChartRect.left + 3,
                 lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5,
@@ -103,14 +114,22 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         }
 
         // подсказки
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             if (State.mouseX >= lineChartRect.left + 3 &&
                 State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getMark(index).value.second / top.toFloat() + lineChartRect.left + 3 &&
                 State.mouseY >= lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5 &&
                 State.mouseY <= lineChartRect.top + 2 * lineChartRadius / vector.data.size  * (index + 1) - 5) {
                 canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
-                break
+                return
             }
         }
+    }
+    // скрин графика
+    fun preview() : Image {
+        val surface = Surface.makeRasterN32Premul(800, 600)
+        val canvas = surface.canvas
+        displayLineChart(canvas, 300f, 300f, 275f)
+        displayLegendLineChart(canvas, 800, 600)
+        return surface.makeImageSnapshot()
     }
 }

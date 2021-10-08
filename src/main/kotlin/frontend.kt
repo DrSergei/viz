@@ -22,15 +22,10 @@ fun checkFile(file: File): Boolean {
         println("Missing file " + file.absolutePath)
         return false
     }
-    if (file.extension != "csv") {
-        println(file.name + " not data file" )
-        return false
-    }
     if (!file.canRead()) {
         println(file.name + " can't read")
         return false
     }
-
     return true
 }
 
@@ -38,6 +33,7 @@ fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         createWindowPieChart(vector.heading, vector)
+        savePieChart(vector, outputFile)
     }
 }
 
@@ -45,6 +41,7 @@ fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         createWindowHistogram(vector.heading, vector)
+        saveHistogram(vector, outputFile)
     }
 }
 
@@ -52,6 +49,7 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         createWindowLineChart(vector.heading, vector)
+        saveLineChart(vector, outputFile)
     }
 }
 

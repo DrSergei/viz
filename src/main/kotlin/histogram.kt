@@ -16,7 +16,9 @@ import javax.swing.*
 import graphics.*
 import graphics.MouseAdapter
 import graphics.MouseMotionAdapter
+import org.jetbrains.skija.Image
 import table.*
+import java.io.*
 
 fun createWindowHistogram(title: String, vector: Vector) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
@@ -32,6 +34,14 @@ fun createWindowHistogram(title: String, vector: Vector) = runBlocking(Dispatche
     window.pack()
     window.layer.awaitRedraw()
     window.isVisible = true
+}
+
+fun saveHistogram(vector: Vector, outputFile: String) {
+    val window = SkiaWindow()
+    val renderer = RendererHistogram(window.layer, vector)
+    val image = renderer.preview()
+    val data = image.encodeToData(EncodedImageFormat.PNG)
+    File(outputFile).writeBytes(data!!.bytes)
 }
 
 class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector): SkiaRenderer {
@@ -63,13 +73,14 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         val histogramRadius = min(centerX, centerY) - 25
 
         displayHistogram(canvas, centerX, centerY, histogramRadius)
-        displayLegendHistogram(canvas, Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat()))
+        displayLegendHistogram(canvas, w, h)
         layer.needRedraw()
     }
 
-    private fun displayLegendHistogram(canvas: Canvas, rect : Rect) {
+    private fun displayLegendHistogram(canvas: Canvas, w: Int, h: Int) {
+        val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             canvas.drawString(vector.getMark(index).value.first, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
             canvas.drawString(vector.getMark(index).value.second.toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
@@ -85,7 +96,7 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         val top = (vector.data.maxOf { it.value.second }.toInt().toString().dropLast(vector.data.maxOf { it.value.second }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.value.second }.toInt().toString().length - 1)
 
         // столбцы
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(
                 histogramRect.left + 2 * histogramRadius / vector.data.size / 10f + 2 * histogramRadius / vector.data.size  * index,
                 (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).value.second / top.toFloat()) + histogramRect.top - 3,
@@ -103,14 +114,23 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         }
 
         // подсказки
-        for (index in vector.data.indices) {
+        vector.data.indices.forEach { index ->
             if (State.mouseY <= histogramRect.bottom - 3 &&
                 State.mouseY >= (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).value.second / top.toFloat()) + histogramRect.top - 3 &&
                 State.mouseX <= histogramRect.left + 2 * histogramRadius / vector.data.size * (index + 1) &&
                 State.mouseX >= histogramRect.left+2 * histogramRadius / vector.data.size / 10f+2 * histogramRadius / vector.data.size  * index) {
                 canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
-                break
+                return
             }
         }
+    }
+
+    // скрин графика
+    fun preview() : Image {
+        val surface = Surface.makeRasterN32Premul(800, 600)
+        val canvas = surface.canvas
+        displayHistogram(canvas, 300f, 300f, 275f)
+        displayLegendHistogram(canvas, 800, 600)
+        return surface.makeImageSnapshot()
     }
 }
