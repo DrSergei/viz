@@ -95,28 +95,48 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         val histogramRect = Rect.makeXYWH(x, y, histogramRadius * 2, histogramRadius * 2)
         val top = (vector.data.maxOf { it.getData() }.toInt().toString().dropLast(vector.data.maxOf { it.getData() }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.getData() }.toInt().toString().length - 1)
 
+        // Оси
+        axis(canvas, histogramRadius, x, y)
+
         // столбцы
+        pillars(canvas, histogramRect, histogramRadius, top.toFloat())
+
+        // Разметка
+        captions(canvas, histogramRadius,top.toFloat(), x,y)
+
+        // подсказки
+        hint(canvas, histogramRect, histogramRadius, top.toFloat())
+    }
+
+    private fun axis(canvas: Canvas, histogramRadius: Float, x: Float, y: Float) {
+        canvas.drawLine(x, y + 2*histogramRadius, x, y, stroke)
+        canvas.drawLine(x, y + 2*histogramRadius, x + 2*histogramRadius, y + 2*histogramRadius, stroke)
+        for (it in 0..10) {
+            canvas.drawLine(x, y + 2*histogramRadius / 10 * it, x + 2*histogramRadius, y + 2*histogramRadius /10 * it, stroke)
+        }
+    }
+
+    private fun pillars(canvas: Canvas, histogramRect: Rect, histogramRadius: Float, top: Float) {
         vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(
                 histogramRect.left + 2 * histogramRadius / vector.data.size / 10f + 2 * histogramRadius / vector.data.size  * index,
-                (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top.toFloat()) + histogramRect.top - 3,
+                (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top) + histogramRect.top - 3,
                 histogramRect.left + 2 * histogramRadius / vector.data.size  * (index + 1),
                 histogramRect.bottom-3), paint(index))
         }
+    }
 
-        // Оси и разметка
-        canvas.drawLine(x, y + 2*histogramRadius, x, y, stroke)
-        canvas.drawLine(x, y + 2*histogramRadius, x + 2*histogramRadius, y + 2*histogramRadius, stroke)
-        for (it in 0..9) {
-            canvas.drawLine(x - 5, y + 2*histogramRadius / 10 * it, x + 5, y + 2*histogramRadius /10 * it, stroke)
+    private fun captions(canvas: Canvas, histogramRadius: Float, top: Float, x: Float, y: Float) {
+        for (it in 0..10) {
             canvas.drawString("${top*(10 - it) / 10}", x - 2 * 2 * histogramRadius / vector.data.size / 10f,y + 2*histogramRadius / 10 * it + 20, font.setSize(font.size / 3), stroke)
             font.size = font.size * 3
         }
+    }
 
-        // подсказки
+    private fun hint(canvas: Canvas, histogramRect: Rect, histogramRadius: Float, top: Float) {
         vector.data.indices.forEach { index ->
             if (State.mouseY <= histogramRect.bottom - 3 &&
-                State.mouseY >= (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top.toFloat()) + histogramRect.top - 3 &&
+                State.mouseY >= (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top) + histogramRect.top - 3 &&
                 State.mouseX <= histogramRect.left + 2 * histogramRadius / vector.data.size * (index + 1) &&
                 State.mouseX >= histogramRect.left+2 * histogramRadius / vector.data.size / 10f+2 * histogramRadius / vector.data.size  * index) {
                 canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)

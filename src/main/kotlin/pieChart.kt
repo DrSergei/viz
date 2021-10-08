@@ -101,22 +101,35 @@ class RendererPieChart(private val layer: SkiaLayer, private val vector : Vector
         canvas.drawOval(pieChartRect, stroke)
 
         // сектора
+        sectors(canvas, pieChartRect)
+
+        // границы
+        axis(canvas, pieChartRadius, centerX, centerY)
+
+        // подсказки
+        hint(canvas, pieChartRadius, centerX, centerY)
+    }
+
+    private fun sectors(canvas: Canvas, pieChartRect: Rect) {
         var angle = 0f
         vector.data.indices.forEach { index ->
             canvas.drawArc(pieChartRect.left,pieChartRect.top,pieChartRect.right,pieChartRect.bottom, angle, vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360, true, paint(index))
             angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
         }
+    }
 
+    private fun axis(canvas: Canvas, pieChartRadius: Float, centerX: Float, centerY: Float) {
         // границы
-        angle = 0f
+        var angle = 0f
         vector.data.indices.forEach { index ->
             canvas.drawLine(centerX, centerY, cos(angle / 180 * PI.toFloat()) * pieChartRadius + centerX, sin(angle / 180 * PI.toFloat()) * pieChartRadius + centerY, stroke)
             angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
         }
+    }
 
-        // подсказки
+    private fun hint(canvas: Canvas, pieChartRadius: Float, centerX: Float, centerY: Float) {
         if (distance(State.mouseX, State.mouseY, centerX, centerY) < pieChartRadius) {
-            angle = 0f
+            var angle = 0f
             vector.data.indices.forEach { index ->
                 angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
                 val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
