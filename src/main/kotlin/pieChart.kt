@@ -71,7 +71,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         canvas.scale(contentScale, contentScale)
         val w = (width / contentScale).toInt()
         val h = (height / contentScale).toInt()
-        font.size = h.toFloat() / 2 / vector.data.size - 1
+        font.size = h.toFloat() / 2 / objects.data.size - 1
 
         val centerX = w.toFloat() * 3 / 8
         val centerY = h.toFloat() / 2
@@ -87,22 +87,8 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
         objects.data.indices.forEach { index ->
-            canvas.drawString(
-                objects.getData(index),
-                rect.left,
-                rect.top + (2 * index + 1) * font.size,
-                font,
-                paint(index)
-            )
-            canvas.drawString(
-                (vector.getData(index) / (vector.data.sumOf {
-                    it.toDouble()
-                }).toFloat() * 100).toInt().toString() + "%",
-                rect.left,
-                rect.top + (2 * index + 2) * font.size,
-                font,
-                paint(index)
-            )
+            canvas.drawString(objects.getData(index), rect.left, rect.top + (2 * index + 1) * font.size, font, paint(index))
+            canvas.drawString((vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 100).toInt().toString() + "%", rect.left, rect.top + (2 * index + 2) * font.size, font, paint(index))
         }
     }
 
@@ -128,16 +114,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
     private fun sectors(canvas: Canvas, pieChartRect: Rect) {
         var angle = 0f
         objects.data.indices.forEach { index ->
-            canvas.drawArc(
-                pieChartRect.left,
-                pieChartRect.top,
-                pieChartRect.right,
-                pieChartRect.bottom,
-                angle,
-                vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360,
-                true,
-                paint(index)
-            )
+            canvas.drawArc(pieChartRect.left, pieChartRect.top, pieChartRect.right, pieChartRect.bottom, angle, vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360, true, paint(index))
             angle += vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360
         }
     }
@@ -146,13 +123,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         // границы
         var angle = 0f
         objects.data.indices.forEach { index ->
-            canvas.drawLine(
-                centerX,
-                centerY,
-                cos(angle / 180 * PI.toFloat()) * pieChartRadius + centerX,
-                sin(angle / 180 * PI.toFloat()) * pieChartRadius + centerY,
-                stroke
-            )
+            canvas.drawLine(centerX, centerY, cos(angle / 180 * PI.toFloat()) * pieChartRadius + centerX, sin(angle / 180 * PI.toFloat()) * pieChartRadius + centerY, stroke)
             angle += vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360
         }
     }
@@ -161,9 +132,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         if (distance(State.mouseX, State.mouseY, centerX, centerY) < pieChartRadius) {
             var angle = 0f
             objects.data.indices.forEach { index ->
-                angle += vector.getData(index) / (vector.data.sumOf {
-                    it.toDouble()
-                }).toFloat() * 360
+                angle += vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360
                 val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
                 if (State.mouseX > centerX && State.mouseY > centerY) {
                     if ((tg < tan(angle / 180 * PI) || angle >= 90) && angle > 0) {

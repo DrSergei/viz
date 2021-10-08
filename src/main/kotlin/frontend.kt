@@ -10,6 +10,8 @@ import cli.*
 import java.io.*
 import pieChart.*
 import histogram.*
+import lineChart.*
+import scatterPlot.*
 import table.*
 
 /**
@@ -56,10 +58,19 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     }
 }
 
+fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
+    val vectorFirst = table.getVector(0)
+    val vectorSecond = table.getVector(1)
+    val objects = table.getObjects()
+    createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
+    saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile)
+}
+
 val handlers = mapOf(
     Mode.PIE_CHART to ::handlerPieChart,
     Mode.HISTOGRAM to ::handlerHistogram,
-    Mode.LINE_CHART to ::handlerLineChart
+    Mode.LINE_CHART to ::handlerLineChart,
+    Mode.SCATTER_PLOT to ::handlerScatterPlot
 )
 
 
@@ -68,8 +79,7 @@ val handlers = mapOf(
  *
  * Выбирает нужный обработчик для каждой операции с учетом режима работы.
  */
-fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) =
-    handlers[mode]?.invoke(table, columns, outputFile)
+fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) = handlers[mode]?.invoke(table, columns, outputFile)
 
 /**
  * Служебная функция.
