@@ -86,8 +86,8 @@ class RendererPieChart(private val layer: SkiaLayer, private val vector : Vector
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
         vector.data.indices.forEach { index ->
-            canvas.drawString(vector.getMark(index).value.first, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
-            canvas.drawString((vector.getMark(index).value.second / (vector.data.sumOf { it.value.second.toDouble() }).toFloat() * 100).toInt().toString() + "%", rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
+            canvas.drawString(vector.getMark(index).getObject(), rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
+            canvas.drawString((vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 100).toInt().toString() + "%", rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
     }
 
@@ -103,44 +103,44 @@ class RendererPieChart(private val layer: SkiaLayer, private val vector : Vector
         // сектора
         var angle = 0f
         vector.data.indices.forEach { index ->
-            canvas.drawArc(pieChartRect.left,pieChartRect.top,pieChartRect.right,pieChartRect.bottom, angle, vector.getMark(index).value.second / (vector.data.sumOf { it.value.second.toDouble() }).toFloat() * 360, true, paint(index))
-            angle += vector.getMark(index).value.second / (vector.data.sumOf { it.value.second.toDouble() }).toFloat() * 360
+            canvas.drawArc(pieChartRect.left,pieChartRect.top,pieChartRect.right,pieChartRect.bottom, angle, vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360, true, paint(index))
+            angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
         }
 
         // границы
         angle = 0f
         vector.data.indices.forEach { index ->
             canvas.drawLine(centerX, centerY, cos(angle / 180 * PI.toFloat()) * pieChartRadius + centerX, sin(angle / 180 * PI.toFloat()) * pieChartRadius + centerY, stroke)
-            angle += vector.getMark(index).value.second / (vector.data.sumOf { it.value.second.toDouble() }).toFloat() * 360
+            angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
         }
 
         // подсказки
         if (distance(State.mouseX, State.mouseY, centerX, centerY) < pieChartRadius) {
             angle = 0f
             vector.data.indices.forEach { index ->
-                angle += vector.getMark(index).value.second / (vector.data.sumOf { it.value.second.toDouble() }).toFloat() * 360
+                angle += vector.getMark(index).getData() / (vector.data.sumOf { it.getData().toDouble() }).toFloat() * 360
                 val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
                 if (State.mouseX > centerX && State.mouseY > centerY) {
                     if ((tg < tan(angle / 180 * PI) || angle >= 90) && angle > 0) {
-                        canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                        canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
                 if (State.mouseX < centerX && State.mouseY > centerY) {
                     if ((tg < tan(angle / 180 * PI) || angle >= 180) && angle > 90) {
-                        canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                        canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
                 if (State.mouseX < centerX && State.mouseY < centerY) {
                     if ((tg < tan(angle / 180 * PI) || angle >= 270) && angle > 180) {
-                        canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                        canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
                 if (State.mouseX > centerX && State.mouseY < centerY) {
                     if ((tg < tan(angle / 180 * PI) || angle >= 360) && angle > 270) {
-                        canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                        canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }

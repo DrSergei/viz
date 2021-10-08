@@ -81,8 +81,8 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
         vector.data.indices.forEach { index ->
-            canvas.drawString(vector.getMark(index).value.first, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
-            canvas.drawString(vector.getMark(index).value.second.toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
+            canvas.drawString(vector.getMark(index).getObject(), rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
+            canvas.drawString(vector.getMark(index).getData().toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
     }
 
@@ -93,13 +93,13 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
 
         // поле рисования
         val histogramRect = Rect.makeXYWH(x, y, histogramRadius * 2, histogramRadius * 2)
-        val top = (vector.data.maxOf { it.value.second }.toInt().toString().dropLast(vector.data.maxOf { it.value.second }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.value.second }.toInt().toString().length - 1)
+        val top = (vector.data.maxOf { it.getData() }.toInt().toString().dropLast(vector.data.maxOf { it.getData() }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.getData() }.toInt().toString().length - 1)
 
         // столбцы
         vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(
                 histogramRect.left + 2 * histogramRadius / vector.data.size / 10f + 2 * histogramRadius / vector.data.size  * index,
-                (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).value.second / top.toFloat()) + histogramRect.top - 3,
+                (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top.toFloat()) + histogramRect.top - 3,
                 histogramRect.left + 2 * histogramRadius / vector.data.size  * (index + 1),
                 histogramRect.bottom-3), paint(index))
         }
@@ -116,10 +116,10 @@ class RendererHistogram(private val layer: SkiaLayer, private val vector: Vector
         // подсказки
         vector.data.indices.forEach { index ->
             if (State.mouseY <= histogramRect.bottom - 3 &&
-                State.mouseY >= (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).value.second / top.toFloat()) + histogramRect.top - 3 &&
+                State.mouseY >= (histogramRect.bottom - histogramRect.top) * (1 - vector.getMark(index).getData() / top.toFloat()) + histogramRect.top - 3 &&
                 State.mouseX <= histogramRect.left + 2 * histogramRadius / vector.data.size * (index + 1) &&
                 State.mouseX >= histogramRect.left+2 * histogramRadius / vector.data.size / 10f+2 * histogramRadius / vector.data.size  * index) {
-                canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                 return
             }
         }

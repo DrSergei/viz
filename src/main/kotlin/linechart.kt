@@ -81,8 +81,8 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
         vector.data.indices.forEach { index ->
-            canvas.drawString(vector.getMark(index).value.first, rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
-            canvas.drawString(vector.getMark(index).value.second.toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
+            canvas.drawString(vector.getMark(index).getObject(), rect.left, rect.top + (2*index + 1) * font.size, font, paint(index))
+            canvas.drawString(vector.getMark(index).getData().toString(), rect.left, rect.top + (2*index + 2) * font.size, font, paint(index))
         }
     }
 
@@ -93,14 +93,14 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
 
         // поле рисования
         val lineChartRect = Rect.makeXYWH(x, y, lineChartRadius * 2, lineChartRadius * 2)
-        val top = (vector.data.maxOf { it.value.second }.toInt().toString().dropLast(vector.data.maxOf { it.value.second }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.value.second }.toInt().toString().length - 1)
+        val top = (vector.data.maxOf { it.getData() }.toInt().toString().dropLast(vector.data.maxOf { it.getData() }.toInt().toString().length - 1).toInt() + 1)*10.toDouble().pow(vector.data.maxOf { it.getData() }.toInt().toString().length - 1)
 
         // столбцы
         vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(
                 lineChartRect.left + 3,
                 lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5,
-                (lineChartRect.right - lineChartRect.left) * vector.getMark(index).value.second / top.toFloat() + lineChartRect.left + 3,
+                (lineChartRect.right - lineChartRect.left) * vector.getMark(index).getData() / top.toFloat() + lineChartRect.left + 3,
                 lineChartRect.top + 2 * lineChartRadius / vector.data.size  * (index + 1)  - 5), paint(index))
         }
 
@@ -116,10 +116,10 @@ class RendererLineChart(private val layer: SkiaLayer, private val vector: Vector
         // подсказки
         vector.data.indices.forEach { index ->
             if (State.mouseX >= lineChartRect.left + 3 &&
-                State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getMark(index).value.second / top.toFloat() + lineChartRect.left + 3 &&
+                State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getMark(index).getData() / top.toFloat() + lineChartRect.left + 3 &&
                 State.mouseY >= lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size  * index - 5 &&
                 State.mouseY <= lineChartRect.top + 2 * lineChartRadius / vector.data.size  * (index + 1) - 5) {
-                canvas.drawString(vector.getMark(index).value.first, State.mouseX, State.mouseY, font, stroke)
+                canvas.drawString(vector.getMark(index).getObject(), State.mouseX, State.mouseY, font, stroke)
                 return
             }
         }
