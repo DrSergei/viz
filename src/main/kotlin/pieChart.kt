@@ -49,7 +49,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
 
     // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    private val font = Font(typeface, 600f / 2 / vector.data.size - 1) // расчет шрифта для предпочитаемого размера
+    private val font = Font(typeface, 600f / 2 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
 
     // цвета
     private val stroke = Paint().apply {
@@ -166,7 +166,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
-        displayPieChart(canvas, 300f, 300f, 275f)
+        displayPieChart(canvas, 300f, 300f, 295f)
         displayLegendPieChart(canvas, 800, 600)
         return surface.makeImageSnapshot()
     }

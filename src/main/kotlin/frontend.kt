@@ -11,6 +11,7 @@ import java.io.*
 import pieChart.*
 import histogram.*
 import lineChart.*
+import radialChart.*
 import scatterPlot.*
 import table.*
 
@@ -59,18 +60,28 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
 }
 
 fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
-    val vectorFirst = table.getVector(0)
-    val vectorSecond = table.getVector(1)
+    if (columns.size == 2) {
+        val vectorFirst = table.getVector(0)
+        val vectorSecond = table.getVector(1)
+        val objects = table.getObjects()
+        createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
+        saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile)
+    }
+}
+
+fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
+    val vectors = columns.map { table.getVector(it) }
     val objects = table.getObjects()
-    createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
-    saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile)
+    createWindowRadialChart(objects.getHead(), objects, vectors)
+    saveRadialChart(objects, vectors, outputFile)
 }
 
 val handlers = mapOf(
     Mode.PIE_CHART to ::handlerPieChart,
     Mode.HISTOGRAM to ::handlerHistogram,
     Mode.LINE_CHART to ::handlerLineChart,
-    Mode.SCATTER_PLOT to ::handlerScatterPlot
+    Mode.SCATTER_PLOT to ::handlerScatterPlot,
+    Mode.RADIAL_CHART to ::handlerRadialChart
 )
 
 
@@ -90,7 +101,11 @@ fun input(arguments: Arguments) {
     val file = File(arguments.inputFile)
     if (checkFile(file)) {
         val buffer = file.readLines()
-        val table = parser(buffer, arguments.delimiter)
-        distributionInput(table, arguments.mode, arguments.columns, arguments.outputFile)
+        try {
+            val table = parser(buffer, arguments.delimiter)
+            distributionInput(table, arguments.mode, arguments.columns, arguments.outputFile)
+        } catch (e : Exception) {
+            println(e.message)
+        }
     }
 }

@@ -30,7 +30,12 @@ fun parser(lines: List<String>, delimiter: String): Table {
     lines.drop(1).forEach { line ->
         val buffer = line.split(delimiter)
         objects.add(buffer.first())
-        data.add(buffer.drop(1).map { it.toFloat() })
+        data.add(
+            buffer.drop(1).map {
+                require(it.toFloat() >= 0)
+                it.toFloat()
+            }
+        )
     }
     return Table(headings, objects, data)
 }

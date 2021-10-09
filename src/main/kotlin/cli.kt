@@ -25,7 +25,8 @@ enum class Mode {
     PIE_CHART, // круговая диаграмм
     HISTOGRAM, // гистограмма
     LINE_CHART, // линейная диаграмма
-    SCATTER_PLOT // точечная диаграмма
+    SCATTER_PLOT, // точечная диаграмма
+    RADIAL_CHART // радиальная диаграмма
 }
 
 /**
