@@ -1,5 +1,15 @@
+/**
+ * Пакет для таблицы.
+ *
+ * Реализует представление текстовых файлов в программе в качестве таблицы(заголовков, объектов и данных)
+ */
 package table
 
+/**
+ * Класс таблицы.
+ *
+ * Реализует методы для получения данных ячейки, заголовка столбца, столбца объектов и целого столбца(вектора).
+ */
 data class Table(val headings: List<String>, val objects: List<String>, val data: List<List<Float>>) {
     private fun getData(row: Int, column: Int) = data[row][column]
 
@@ -17,12 +27,22 @@ data class Table(val headings: List<String>, val objects: List<String>, val data
     }
 }
 
+/**
+ * Класс вектора.
+ *
+ * Хранит заголовок и данные любого типа.
+ */
 data class Vector<T>(val heading: String, val data: List<T>) {
     fun getHead() = heading
 
     fun getData(row: Int) = data[row]
 }
 
+/**
+ * Служебная функция.
+ *
+ * Преобразует строки в таблицу.
+ */
 fun parser(lines: List<String>, delimiter: String): Table {
     val headings = lines[0].split(delimiter)
     val objects = mutableListOf<String>()

@@ -32,6 +32,11 @@ fun checkFile(file: File): Boolean {
     return true
 }
 
+/**
+ * Служебная функция.
+ *
+ * Обработчик построения круговой диаграммы.
+ */
 fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
@@ -41,6 +46,11 @@ fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
     }
 }
 
+/**
+ * Служебная функция.
+ *
+ * Обработчик построения гистограммы.
+ */
 fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
@@ -50,6 +60,11 @@ fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
     }
 }
 
+/**
+ * Служебная функция.
+ *
+ * Обработчик построения линейной диаграммы.
+ */
 fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
@@ -59,6 +74,11 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     }
 }
 
+/**
+ * Служебная функция.
+ *
+ * Обработчик построения диаграммы рассеивания.
+ */
 fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
     if (columns.size == 2) {
         val vectorFirst = table.getVector(0)
@@ -69,6 +89,11 @@ fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
     }
 }
 
+/**
+ * Служебная функция.
+ *
+ * Обработчик построения радиальной диаграммы.
+ */
 fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
     val vectors = columns.map { table.getVector(it) }
     val objects = table.getObjects()
@@ -76,6 +101,11 @@ fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
     saveRadialChart(objects, vectors, outputFile)
 }
 
+/**
+ * Таблица методов.
+ *
+ * Обработчики построения графиков.
+ */
 val handlers = mapOf(
     Mode.PIE_CHART to ::handlerPieChart,
     Mode.HISTOGRAM to ::handlerHistogram,
@@ -83,7 +113,6 @@ val handlers = mapOf(
     Mode.SCATTER_PLOT to ::handlerScatterPlot,
     Mode.RADIAL_CHART to ::handlerRadialChart
 )
-
 
 /**
  * Служебная функция.
@@ -105,7 +134,7 @@ fun input(arguments: Arguments) {
             val table = parser(buffer, arguments.delimiter)
             distributionInput(table, arguments.mode, arguments.columns, arguments.outputFile)
         } catch (e : Exception) {
-            println(e.message)
+            println("Invalid format data.")
         }
     }
 }

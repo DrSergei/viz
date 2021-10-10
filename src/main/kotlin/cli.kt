@@ -8,6 +8,11 @@ package cli
 // Импорт.
 import kotlinx.cli.*
 
+/**
+ * Представление аргументов.
+ *
+ * Служит для передачи обработанных аргументов командной строки.
+ */
 data class Arguments(
     val inputFile: String,
     val delimiter: String,
