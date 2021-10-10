@@ -1,3 +1,8 @@
+/**
+ * Графический пакет.
+ *
+ * Строит диаграммы рассеивания.
+ */
 package scatterPlot
 
 // Импорт
@@ -20,6 +25,11 @@ import org.jetbrains.skija.Image
 import table.*
 import java.io.*
 
+/**
+ * Функция создания окна.
+ *
+ * Создает окно с диаграммой рассеивания по переданным векторам.
+ */
 fun createWindowScatterPlot(title: String, objects: Vector<String>, vectorFirst: Vector<Float>, vectorSecond: Vector<Float>) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -36,6 +46,11 @@ fun createWindowScatterPlot(title: String, objects: Vector<String>, vectorFirst:
     window.isVisible = true
 }
 
+/**
+ *  Функция сохранения графика в файл.
+ *
+ *  Сохраняет диаграмму рассеивания в разрешении 800*600 в файл.
+ */
 fun saveScatterPlot(objects: Vector<String>, vectorFirst: Vector<Float>, vectorSecond: Vector<Float>, outputFile: String) {
     val window = SkiaWindow()
     val renderer = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
@@ -44,21 +59,39 @@ fun saveScatterPlot(objects: Vector<String>, vectorFirst: Vector<Float>, vectorS
     File(outputFile).writeBytes(data!!.bytes)
 }
 
+/**
+ * Класс для рендера.
+ *
+ * Реализует рисование в окне и создание превью через публичные методы.
+ */
 class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vector<String>, private val vectorFirst: Vector<Float>, private val vectorSecond: Vector<Float>) : SkiaRenderer {
+    // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 600f / 2 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
+
+    /**
+     * Цвет границ и подписей.
+     */
     private val stroke = Paint().apply {
         color = 0xFF000000.toInt()
         mode = PaintMode.STROKE
         strokeWidth = 2.5f
     }
 
+    /**
+     * Цвет для рисования содержимого диаграмм, определяется по их номеру.
+     */
     private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Реализует цикл перерисовки.
+     */
     @ExperimentalTime
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -76,6 +109,11 @@ class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vec
         layer.needRedraw()
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка поля с информацией.
+     */
     private fun displayLegendScatterPlot(canvas: Canvas, w: Int, h: Int) {
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
@@ -86,6 +124,11 @@ class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vec
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка самой диаграммы.
+     */
     private fun displayScatterPlot(canvas: Canvas, centerX: Float, centerY: Float, scatterPlotRadius: Float) {
         // координаты
         val x = centerX - scatterPlotRadius
@@ -113,33 +156,52 @@ class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vec
         hint(canvas, scatterPlotRect, scatterPlotRadius, topFirst, topSecond)
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка осей.
+     */
     private fun axis(canvas: Canvas, scatterPlotRadius: Float, x: Float, y: Float) {
         canvas.drawLine(x, y + 2 * scatterPlotRadius, x, y, stroke)
         canvas.drawLine(x, y + 2 * scatterPlotRadius, x + 2 * scatterPlotRadius, y + 2 * scatterPlotRadius, stroke)
         for (it in 0..10)
             canvas.drawLine(x, y + 2 * scatterPlotRadius / 10 * it, x + 2 * scatterPlotRadius, y + 2 * scatterPlotRadius / 10 * it, stroke)
-
         for (it in 0..10)
             canvas.drawLine(x + 2 * scatterPlotRadius / 10 * it, y + 2 * scatterPlotRadius, x + 2 * scatterPlotRadius / 10 * it, y, stroke)
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка точек(данных) на диаграмме.
+     */
     private fun points(canvas: Canvas, scatterPlotRect: Rect, scatterPlotRadius: Float, topFirst: Float, topSecond: Float) {
         objects.data.indices.forEach { index ->
             canvas.drawCircle(scatterPlotRect.left + vectorFirst.getData(index) / topFirst * 2 * scatterPlotRadius, scatterPlotRect.bottom - vectorSecond.getData(index) / topSecond * 2 * scatterPlotRadius, 10f, paint(index))
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка подписей.
+     */
     private fun captions(canvas: Canvas, scatterPlotRadius: Float, topFirst: Float, topSecond: Float, x: Float, y: Float) {
-        for (it in 0..10) {
-            canvas.drawString("${topFirst * it / 10}", x + 2 * scatterPlotRadius / 10 * it - 15, y + 2 * scatterPlotRadius + 20, font.setSize(font.size / 3), stroke)
-            font.size = font.size * 3
-        }
-        for (it in 0..10) {
-            canvas.drawString("${topSecond * (10 - it) / 10}", x - 15, y + 2 * scatterPlotRadius / 10 * it + 20, font.setSize(font.size / 3), stroke)
-            font.size = font.size * 3
-        }
+        font.size /= 3
+        stroke.mode = PaintMode.STROKE_AND_FILL
+        for (it in 0..10)
+            canvas.drawString("${topFirst * it / 10}", x + 2 * scatterPlotRadius / 10 * it - 15, y + 2 * scatterPlotRadius + 20, font, stroke)
+        for (it in 0..10)
+            canvas.drawString("${topSecond * (10 - it) / 10}", x - 15, y + 2 * scatterPlotRadius / 10 * it + 20, font, stroke)
+        font.size *= 3
+        stroke.mode = PaintMode.STROKE
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка всплывающих подсказок.
+     */
     private fun hint(canvas: Canvas, scatterPlotRect: Rect, scatterPlotRadius: Float, topFirst: Float, topSecond: Float) {
         objects.data.indices.forEach { index ->
             val x = scatterPlotRect.left + vectorFirst.getData(index) / topFirst * 2 * scatterPlotRadius
@@ -151,7 +213,11 @@ class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vec
         }
     }
 
-    // скрин графика
+    /**
+     * Служебная функция.
+     *
+     * Рисует превью графика(800*600).
+     */
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas

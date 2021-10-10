@@ -1,3 +1,8 @@
+/**
+ * Графический пакет.
+ *
+ * Строит линейные диаграммы.
+ */
 package lineChart
 
 // Импорт
@@ -20,6 +25,11 @@ import org.jetbrains.skija.Image
 import table.*
 import java.io.*
 
+/**
+ * Функция создания окна.
+ *
+ * Создает окно с линейной диаграммой по переданному вектору.
+ */
 fun createWindowLineChart(title: String, objects: Vector<String>, vector: Vector<Float>) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -36,6 +46,11 @@ fun createWindowLineChart(title: String, objects: Vector<String>, vector: Vector
     window.isVisible = true
 }
 
+/**
+ *  Функция сохранения графика в файл.
+ *
+ *  Сохраняет линейную диаграмму в разрешении 800*600 в файл.
+ */
 fun saveLineChart(objects: Vector<String>, vector: Vector<Float>, outputFile: String) {
     val window = SkiaWindow()
     val renderer = RendererLineChart(window.layer, objects, vector)
@@ -44,21 +59,39 @@ fun saveLineChart(objects: Vector<String>, vector: Vector<Float>, outputFile: St
     File(outputFile).writeBytes(data!!.bytes)
 }
 
+/**
+ * Класс для рендера.
+ *
+ * Реализует рисование в окне и создание превью через публичные методы.
+ */
 class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vector<String>, private val vector: Vector<Float>) : SkiaRenderer {
+    // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 600f / 2 / vector.data.size - 1) // расчет шрифта для предпочитаемого размера
+
+    /**
+     * Цвет границ и подписей.
+     */
     private val stroke = Paint().apply {
         color = 0xFF000000.toInt()
         mode = PaintMode.STROKE
         strokeWidth = 2.5f
     }
 
+    /**
+     * Цвет для рисования содержимого диаграмм, определяется по их номеру.
+     */
     private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Реализует цикл перерисовки.
+     */
     @ExperimentalTime
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -76,6 +109,11 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
         layer.needRedraw()
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка поля с информацией.
+     */
     private fun displayLegendLineChart(canvas: Canvas, w: Int, h: Int) {
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
@@ -85,6 +123,11 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка самой диаграммы.
+     */
     private fun displayLineChart(canvas: Canvas, centerX: Float, centerY: Float, lineChartRadius: Float) {
         // координаты
         val x = centerX - lineChartRadius
@@ -109,6 +152,11 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
         hint(canvas, lineChartRect, lineChartRadius, top)
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка осей.
+     */
     private fun axis(canvas: Canvas, lineChartRadius: Float, x: Float, y: Float) {
         canvas.drawLine(x, y + 2 * lineChartRadius, x, y, stroke)
         canvas.drawLine(x, y + 2 * lineChartRadius, x + 2 * lineChartRadius, y + 2 * lineChartRadius, stroke)
@@ -116,12 +164,22 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
             canvas.drawLine(x + 2 * lineChartRadius / 10 * it, y + 2 * lineChartRadius, x + 2 * lineChartRadius / 10 * it, y, stroke)
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка столбцов.
+     */
     private fun pillars(canvas: Canvas, lineChartRect: Rect, lineChartRadius: Float, top: Float) {
         vector.data.indices.forEach { index ->
             canvas.drawRect(Rect(lineChartRect.left + 3, lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size * index - 5, (lineChartRect.right - lineChartRect.left) * vector.getData(index) / top + lineChartRect.left + 3, lineChartRect.top + 2 * lineChartRadius / vector.data.size * (index + 1) - 5), paint(index))
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка подписей.
+     */
     private fun captions(canvas: Canvas, lineChartRadius: Float, top: Float, x: Float, y: Float) {
         for (it in 0..10) {
             canvas.drawString("${top * it / 10}", x + 2 * lineChartRadius / 10 * it - 15, y + 2 * lineChartRadius + 20, font.setSize(font.size / 3), stroke)
@@ -129,6 +187,11 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка всплывающих подсказок.
+     */
     private fun hint(canvas: Canvas, lineChartRect: Rect, lineChartRadius: Float, top: Float) {
         objects.data.indices.forEach { index ->
             if (State.mouseX >= lineChartRect.left + 3 && State.mouseX <= (lineChartRect.right - lineChartRect.left) * vector.getData(index) / top + lineChartRect.left + 3 && State.mouseY >= lineChartRect.top + 2 * lineChartRadius / vector.data.size / 10f + 2 * lineChartRadius / vector.data.size * index - 5 && State.mouseY <= lineChartRect.top + 2 * lineChartRadius / vector.data.size * (index + 1) - 5) {
@@ -138,7 +201,11 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
         }
     }
 
-    // скрин графика
+    /**
+     * Служебная функция.
+     *
+     * Рисует превью графика(800*600).
+     */
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas

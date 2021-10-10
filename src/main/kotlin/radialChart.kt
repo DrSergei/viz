@@ -1,3 +1,8 @@
+/**
+ * Графический пакет.
+ *
+ * Строит радиальные диаграммы.
+ */
 package radialChart
 
 // Импорт
@@ -20,6 +25,11 @@ import org.jetbrains.skija.Image
 import table.*
 import java.io.*
 
+/**
+ * Функция создания окна.
+ *
+ * Создает окно с радиальной диаграммой по переданным векторам.
+ */
 fun createWindowRadialChart(title: String, objects: Vector<String>, vectors: List<Vector<Float>>) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     val renderer = RendererRadialChart(window.layer, objects, vectors)
@@ -37,6 +47,11 @@ fun createWindowRadialChart(title: String, objects: Vector<String>, vectors: Lis
     window.isVisible = true
 }
 
+/**
+ *  Функция сохранения графика в файл.
+ *
+ *  Сохраняет радиальную диаграмму в разрешении 800*600 в файл.
+ */
 fun saveRadialChart(objects: Vector<String>, vectors: List<Vector<Float>>, outputFile: String) {
     val window = SkiaWindow()
     val renderer = RendererRadialChart(window.layer, objects, vectors)
@@ -45,19 +60,29 @@ fun saveRadialChart(objects: Vector<String>, vectors: List<Vector<Float>>, outpu
     File(outputFile).writeBytes(data!!.bytes)
 }
 
-class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vector<String>, private val vectors: List<Vector<Float>>) : SkiaRenderer {
 
+/**
+ * Класс для рендера.
+ *
+ * Реализует рисование в окне и создание превью через публичные методы.
+ */
+class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vector<String>, private val vectors: List<Vector<Float>>) : SkiaRenderer {
     // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 600f / 2 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
 
-    // цвета
+    /**
+     * Цвет границ и подписей.
+     */
     private val stroke = Paint().apply {
         color = 0xFF000000.toInt()
         mode = PaintMode.STROKE
         strokeWidth = 2.5f
     }
 
+    /**
+     * Цвет для рисования содержимого диаграмм, определяется по их номеру.
+     */
     private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
@@ -65,7 +90,11 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
         }
     }
 
-    // отрисовка
+    /**
+     * Служебная функция.
+     *
+     * Реализует цикл перерисовки.
+     */
     @ExperimentalTime
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -76,13 +105,18 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
 
         val centerX = w.toFloat() * 3 / 8
         val centerY = h.toFloat() / 2
-        val radialChartRadius = min(centerX, centerY) - 35
+        val radialChartRadius = min(centerX, centerY) - 25
 
         displayLegendRadialChart(canvas, w, h)
         displayRadialChart(canvas, centerX, centerY, radialChartRadius)
         layer.needRedraw()
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка поля с информацией.
+     */
     private fun displayLegendRadialChart(canvas: Canvas, w: Int, h: Int) {
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
@@ -91,6 +125,11 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка самой диаграммы.
+     */
     private fun displayRadialChart(canvas: Canvas, centerX: Float, centerY: Float, radialChartRadius: Float) {
         // координаты
         val x = centerX - radialChartRadius
@@ -121,9 +160,13 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
 
         // подсказки
         hint(canvas, radialChartRadius, centerX, centerY, tops)
-
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка точек(данных) на диаграмме.
+     */
     private fun points(canvas: Canvas, radialChartRadius: Float, centerX: Float, centerY: Float, tops: List<Float>) {
         var angle = 0f
         vectors.indices.forEach { index ->
@@ -138,26 +181,36 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка линий соединяющих точки.
+     */
     private fun lines(canvas: Canvas, radialChartRadius: Float, centerX: Float, centerY: Float, tops: List<Float>) {
-        var angle = 0f
+        var degree = 0f
         vectors.indices.forEach { index ->
-            val vector1 = vectors[index]
-            val vector2 = vectors[(index + 1) % vectors.size]
-            val top1 = tops[index]
-            val top2 = tops[(index + 1) % vectors.size]
-            val angle1 = angle
-            val angle2 = angle + 360 / vectors.size
-            vector1.data.indices.forEach {
-                val dx1 = vector1.getData(it)/top1*radialChartRadius*cos(angle1 / 180 * PI).toFloat()
-                val dy1 = vector1.getData(it)/top1*radialChartRadius*sin(angle1 / 180 * PI).toFloat()
-                val dx2 = vector2.getData(it)/top2*radialChartRadius*cos(angle2 / 180 * PI).toFloat()
-                val dy2 = vector2.getData(it)/top2*radialChartRadius*sin(angle2 / 180 * PI).toFloat()
-                canvas.drawLine(centerX + dx1, centerY + dy1, centerX + dx2, centerY +dy2, paint(it))
+            val vector = vectors[index]
+            val vectorNext = vectors[(index + 1) % vectors.size]
+            val top = tops[index]
+            val topNext = tops[(index + 1) % vectors.size]
+            val angle = degree
+            val angleNext = angle + 360 / vectors.size
+            vector.data.indices.forEach {
+                val dx = vector.getData(it) / top * radialChartRadius * cos(angle / 180 * PI).toFloat()
+                val dy = vector.getData(it) / top * radialChartRadius * sin(angle / 180 * PI).toFloat()
+                val dxNext = vectorNext.getData(it) / topNext * radialChartRadius * cos(angleNext / 180 * PI).toFloat()
+                val dyNext = vectorNext.getData(it) / topNext * radialChartRadius * sin(angleNext / 180 * PI).toFloat()
+                canvas.drawLine(centerX + dx, centerY + dy, centerX + dxNext, centerY + dyNext, paint(it))
             }
-            angle += 360 / vectors.size
+            degree += 360 / vectors.size
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка осей.
+     */
     private fun axis(canvas: Canvas, radialChartRadius: Float, centerX: Float, centerY: Float) {
         var angle = 0f
         stroke.mode = PaintMode.STROKE_AND_FILL
@@ -165,7 +218,6 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
             var dx = radialChartRadius * cos(angle / 180 * PI).toFloat()
             var dy = radialChartRadius * sin(angle / 180 * PI).toFloat()
             canvas.drawLine(centerX, centerY, centerX + dx, centerY + dy, stroke)
-
             for (at in 0..10) {
                 dx = (radialChartRadius * cos(angle / 180 * PI) * at / 10).toFloat()
                 dy = (radialChartRadius * sin(angle / 180 * PI) * at / 10).toFloat()
@@ -176,6 +228,11 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
         stroke.mode = PaintMode.STROKE
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка подписей.
+     */
     private fun captions(canvas: Canvas, radialChartRadius: Float, centerX: Float, centerY: Float, tops: List<Float>) {
         var angle = 0f
         font.size /= 3
@@ -191,6 +248,11 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
         stroke.mode = PaintMode.STROKE
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка всплывающих подсказок.
+     */
     private fun hint(canvas: Canvas, radialChartRadius: Float, centerX: Float, centerY: Float, tops: List<Float>) {
         var angle = 0f
         font.size /= 2
@@ -200,20 +262,24 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
             vector.data.indices.forEach {
                 val dx = vector.getData(it)/top*radialChartRadius*cos(angle / 180 * PI).toFloat()
                 val dy = vector.getData(it)/top*radialChartRadius*sin(angle / 180 * PI).toFloat()
-                if (distance(State.mouseX, State.mouseY, centerX + dx, centerY + dy) <= 10f) {
+                if (distance(State.mouseX, State.mouseY, centerX + dx, centerY + dy) <= 10f)
                     canvas.drawString("${vector.getData(it)}", State.mouseX, State.mouseY, font, stroke)
-                }
             }
             angle += 360 / vectors.size
         }
         font.size *= 2
     }
 
-    // скрин графика
+    /**
+     * Служебная функция.
+     *
+     * Рисует превью графика(800*600).
+     */
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
-        displayRadialChart(canvas, 400f, 300f, 295f)
+        displayLegendRadialChart(canvas, 800, 600)
+        displayRadialChart(canvas, 300f, 300f, 275f)
         return surface.makeImageSnapshot()
     }
 }

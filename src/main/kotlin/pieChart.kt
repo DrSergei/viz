@@ -1,3 +1,8 @@
+/**
+ * Графический пакет.
+ *
+ * Строит круговые диаграммы.
+ */
 package pieChart
 
 // Импорт
@@ -20,6 +25,11 @@ import org.jetbrains.skija.Image
 import table.*
 import java.io.*
 
+/**
+ * Функция создания окна.
+ *
+ * Создает окно с круговой диаграммой по переданному вектору.
+ */
 fun createWindowPieChart(title: String, objects: Vector<String>, vector: Vector<Float>) = runBlocking(Dispatchers.Swing) {
     val window = SkiaWindow()
     val renderer = RendererPieChart(window.layer, objects, vector)
@@ -37,6 +47,11 @@ fun createWindowPieChart(title: String, objects: Vector<String>, vector: Vector<
     window.isVisible = true
 }
 
+/**
+ *  Функция сохранения графика в файл.
+ *
+ *  Сохраняет круговую диаграмму в разрешении 800*600 в файл.
+ */
 fun savePieChart(objects: Vector<String>, vector: Vector<Float>, outputFile: String) {
     val window = SkiaWindow()
     val renderer = RendererPieChart(window.layer, objects, vector)
@@ -45,26 +60,39 @@ fun savePieChart(objects: Vector<String>, vector: Vector<Float>, outputFile: Str
     File(outputFile).writeBytes(data!!.bytes)
 }
 
+/**
+ * Класс для рендера.
+ *
+ * Реализует рисование в окне и создание превью через публичные методы.
+ */
 class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector<String>, private val vector: Vector<Float>) : SkiaRenderer {
-
     // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
     private val font = Font(typeface, 600f / 2 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
 
-    // цвета
+    /**
+     * Цвет границ и подписей.
+     */
     private val stroke = Paint().apply {
         color = 0xFF000000.toInt()
         mode = PaintMode.STROKE
         strokeWidth = 2.5f
     }
 
+    /**
+     * Цвет для рисования содержимого диаграмм, определяется по их номеру.
+     */
     private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
         }
     }
 
-    // отрисовка
+    /**
+     * Служебная функция.
+     *
+     * Реализует цикл перерисовки.
+     */
     @ExperimentalTime
     override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
         val contentScale = layer.contentScale
@@ -82,7 +110,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         layer.needRedraw()
     }
 
-    //
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка поля с информацией.
+     */
     private fun displayLegendPieChart(canvas: Canvas, w: Int, h: Int) {
         val rect = Rect(w.toFloat() * 3 / 4, 1f, w.toFloat(), h.toFloat())
         canvas.drawRect(rect, stroke)
@@ -92,6 +124,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка самой диаграммы.
+     */
     private fun displayPieChart(canvas: Canvas, centerX: Float, centerY: Float, pieChartRadius: Float) {
         // координаты
         val x = centerX - pieChartRadius
@@ -111,6 +148,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         hint(canvas, pieChartRadius, centerX, centerY)
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка секторов.
+     */
     private fun sectors(canvas: Canvas, pieChartRect: Rect) {
         var angle = 0f
         objects.data.indices.forEach { index ->
@@ -119,6 +161,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка осей.
+     */
     private fun axis(canvas: Canvas, pieChartRadius: Float, centerX: Float, centerY: Float) {
         // границы
         var angle = 0f
@@ -128,6 +175,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         }
     }
 
+    /**
+     * Служебная функция.
+     *
+     * Отрисовка всплывающих подсказок.
+     */
     private fun hint(canvas: Canvas, pieChartRadius: Float, centerX: Float, centerY: Float) {
         if (distance(State.mouseX, State.mouseY, centerX, centerY) < pieChartRadius) {
             var angle = 0f
@@ -162,7 +214,11 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
         }
     }
 
-    // скрин графика
+    /**
+     * Служебная функция.
+     *
+     * Рисует превью графика(800*600).
+     */
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
