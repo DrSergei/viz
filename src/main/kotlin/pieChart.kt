@@ -23,7 +23,6 @@ import graphics.MouseAdapter
 import graphics.MouseMotionAdapter
 import org.jetbrains.skija.Image
 import table.*
-import java.awt.Color
 import java.io.*
 
 /**
@@ -187,25 +186,25 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
             objects.data.indices.forEach { index ->
                 angle += vector.getData(index) / (vector.data.sumOf { it.toDouble() }).toFloat() * 360
                 val tg = (State.mouseY - centerY) / (State.mouseX - centerX)
-                if (State.mouseX > centerX && State.mouseY > centerY) {
+                if (State.mouseX > centerX && State.mouseY > centerY) { // первая четверть
                     if ((tg < tan(angle / 180 * PI) || angle >= 90) && angle > 0) {
                         canvas.drawString(objects.getData(index), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
-                if (State.mouseX < centerX && State.mouseY > centerY) {
+                if (State.mouseX < centerX && State.mouseY > centerY) { // вторая четверть
                     if ((tg < tan(angle / 180 * PI) || angle >= 180) && angle > 90) {
                         canvas.drawString(objects.getData(index), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
-                if (State.mouseX < centerX && State.mouseY < centerY) {
+                if (State.mouseX < centerX && State.mouseY < centerY) { // третья четверть
                     if ((tg < tan(angle / 180 * PI) || angle >= 270) && angle > 180) {
                         canvas.drawString(objects.getData(index), State.mouseX, State.mouseY, font, stroke)
                         return
                     }
                 }
-                if (State.mouseX > centerX && State.mouseY < centerY) {
+                if (State.mouseX > centerX && State.mouseY < centerY) { // четвертая четверть
                     if ((tg < tan(angle / 180 * PI) || angle >= 360) && angle > 270) {
                         canvas.drawString(objects.getData(index), State.mouseX, State.mouseY, font, stroke)
                         return
