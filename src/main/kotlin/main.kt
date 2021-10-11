@@ -11,6 +11,6 @@ fun main(args: Array<String>) {
         }
         println("$time")
     } catch (e: Exception) {
-        println(e.message)
+        println("Fatal error")
     }
 }

@@ -86,7 +86,8 @@ fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
         val objects = table.getObjects()
         createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
         saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile)
-    }
+    } else
+        println("Too many columns")
 }
 
 /**
@@ -119,7 +120,21 @@ val handlers = mapOf(
  *
  * Выбирает нужный обработчик для каждой операции с учетом режима работы.
  */
-fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) = handlers[mode]?.invoke(table, columns, outputFile)
+fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) {
+    if (columns.isEmpty()) {
+        println("Empty request")
+        return
+    }
+    if (columns.maxOf { it } > table.columns ) {
+        println("Request out of columns")
+        return
+    }
+    try {
+        handlers[mode]?.invoke(table, columns, outputFile)
+    } catch (e: Exception) {
+        println("Graphics interface error")
+    }
+}
 
 /**
  * Служебная функция.

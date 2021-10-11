@@ -50,7 +50,7 @@ fun prepareArgs(args: Array<String>): Arguments {
         parser.parse(args)
         return Arguments(inputFile, delimiter, mode, outputFile, columns)
     } catch (e: Exception) {
-        println(e.message)
+        println("Error in CLI")
         throw e
     }
 }
