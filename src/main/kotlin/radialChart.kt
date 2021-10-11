@@ -278,6 +278,7 @@ class RendererRadialChart(private val layer: SkiaLayer, private val objects: Vec
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
+        canvas.drawRect(Rect(0f,0f,800f, 600f), Paint().apply {  color = 0XFFFFFFFF.toInt(); mode = PaintMode.FILL }) // фон
         displayLegendRadialChart(canvas, 800, 600)
         displayRadialChart(canvas, 300f, 300f, 275f)
         return surface.makeImageSnapshot()

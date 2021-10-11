@@ -23,6 +23,7 @@ import graphics.MouseAdapter
 import graphics.MouseMotionAdapter
 import org.jetbrains.skija.Image
 import table.*
+import java.awt.Color
 import java.io.*
 
 /**
@@ -222,6 +223,7 @@ class RendererPieChart(private val layer: SkiaLayer, private val objects: Vector
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
+        canvas.drawRect(Rect(0f,0f,800f, 600f), Paint().apply {  color = 0XFFFFFFFF.toInt(); mode = PaintMode.FILL }) // фон
         displayPieChart(canvas, 300f, 300f, 295f)
         displayLegendPieChart(canvas, 800, 600)
         return surface.makeImageSnapshot()

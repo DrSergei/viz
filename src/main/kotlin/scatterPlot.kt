@@ -221,6 +221,7 @@ class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vec
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
+        canvas.drawRect(Rect(0f,0f,800f, 600f), Paint().apply {  color = 0XFFFFFFFF.toInt(); mode = PaintMode.FILL }) // фон
         displayScatterPlot(canvas, 300f, 300f, 275f)
         displayLegendScatterPlot(canvas, 800, 600)
         return surface.makeImageSnapshot()

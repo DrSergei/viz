@@ -209,6 +209,7 @@ class RendererLineChart(private val layer: SkiaLayer,  private val objects: Vect
     fun preview(): Image {
         val surface = Surface.makeRasterN32Premul(800, 600)
         val canvas = surface.canvas
+        canvas.drawRect(Rect(0f,0f,800f, 600f), Paint().apply {  color = 0XFFFFFFFF.toInt(); mode = PaintMode.FILL }) // фон
         displayLineChart(canvas, 300f, 300f, 275f)
         displayLegendLineChart(canvas, 800, 600)
         return surface.makeImageSnapshot()
