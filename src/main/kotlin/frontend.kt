@@ -42,7 +42,7 @@ fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
         val vector = table.getVector(it)
         val objects = table.getObjects()
         createWindowPieChart(vector.getHead(), objects, vector)
-        savePieChart(objects, vector, outputFile)
+        savePieChart(objects, vector, outputFile.split(".").first() + "_$it" + ".png")
     }
 }
 
@@ -56,7 +56,7 @@ fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
         val vector = table.getVector(it)
         val objects = table.getObjects()
         createWindowHistogram(vector.getHead(), objects, vector)
-        saveHistogram(objects, vector, outputFile)
+        saveHistogram(objects, vector, outputFile.split(".").first() + "_$it" + ".png")
     }
 }
 
@@ -70,7 +70,7 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
         val vector = table.getVector(it)
         val objects = table.getObjects()
         createWindowLineChart(vector.getHead(), objects, vector)
-        saveLineChart(objects,vector, outputFile)
+        saveLineChart(objects,vector, outputFile.split(".").first() + "_$it" + ".png")
     }
 }
 
@@ -81,11 +81,11 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
  */
 fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
     if (columns.size == 2) {
-        val vectorFirst = table.getVector(0)
-        val vectorSecond = table.getVector(1)
+        val vectorFirst = table.getVector(columns.first())
+        val vectorSecond = table.getVector(columns.last())
         val objects = table.getObjects()
         createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
-        saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile)
+        saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile.split(".").first() + "_${columns.first()}_${columns.last()}" + ".png")
     } else
         println("Too many columns")
 }
@@ -99,7 +99,7 @@ fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
     val vectors = columns.map { table.getVector(it) }
     val objects = table.getObjects()
     createWindowRadialChart(objects.getHead(), objects, vectors)
-    saveRadialChart(objects, vectors, outputFile)
+    saveRadialChart(objects, vectors, outputFile + columns.joinToString("_", "_", "", ) + ".png")
 }
 
 /**
