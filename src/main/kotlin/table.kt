@@ -16,14 +16,14 @@ data class Table(val headings: List<String>, val objects: List<String>, val data
      *
      * Возвращает значения ячейки.
      */
-    private fun getData(row: Int, column: Int) = data[row][column]
+    fun getData(row: Int, column: Int) = data[row][column]
 
     /**
      * Служебная функция.
      *
      * Возвращает значения заголовка.
      */
-    private fun getHeading(column: Int) = headings[column]
+    fun getHeading(column: Int) = headings[column]
 
     /**
      * Служебная функция.

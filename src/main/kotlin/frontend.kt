@@ -31,6 +31,10 @@ fun checkFile(file: File): Boolean {
         logger.error {file.name + " can't read"}
         return false
     }
+    if (file.extension != "csv") {
+        logger.error {file.name + " not .csv"}
+        return false
+    }
     return true
 }
 
