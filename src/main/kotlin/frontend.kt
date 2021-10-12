@@ -14,6 +14,8 @@ import lineChart.*
 import radialChart.*
 import scatterPlot.*
 import table.*
+import mu.KotlinLogging
+
 
 /**
  * Служебная функция.
@@ -22,11 +24,11 @@ import table.*
  */
 fun checkFile(file: File): Boolean {
     if (!file.exists()) {
-        println("Missing file " + file.absolutePath)
+        logger.error {"Missing file " + file.absolutePath}
         return false
     }
     if (!file.canRead()) {
-        println(file.name + " can't read")
+        logger.error {file.name + " can't read"}
         return false
     }
     return true
@@ -87,7 +89,7 @@ fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
         createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
         saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile.split(".").first() + "_${columns.first()}_${columns.last()}" + ".png")
     } else
-        println("Too many columns")
+        logger.error {"Too many columns"}
 }
 
 /**
@@ -99,7 +101,7 @@ fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
     val vectors = columns.map { table.getVector(it) }
     val objects = table.getObjects()
     createWindowRadialChart(objects.getHead(), objects, vectors)
-    saveRadialChart(objects, vectors, outputFile + columns.joinToString("_", "_", "", ) + ".png")
+    saveRadialChart(objects, vectors, outputFile + columns.joinToString("_", "_", "") + ".png")
 }
 
 /**
@@ -122,26 +124,28 @@ val handlers = mapOf(
  */
 fun distributionInput(table: Table, mode: Mode, columns: List<Int>, outputFile: String) {
     if (columns.isEmpty()) {
-        println("Empty request")
+        logger.error {"Empty request"}
         return
     }
     if (columns.maxOf { it } > table.columns ) {
-        println("Request out of columns")
+        logger.error {"Request out of columns"}
         return
     }
     try {
         handlers[mode]?.invoke(table, columns, outputFile)
     } catch (e: Exception) {
-        println("Graphics interface error")
+        logger.error {"Graphics interface error"}
     }
 }
 
+val logger = KotlinLogging.logger {  }
 /**
  * Служебная функция.
  *
  * Работа с вводом.
  */
 fun input(arguments: Arguments) {
+    logger.info {"program started"}
     val file = File(arguments.inputFile)
     if (checkFile(file)) {
         val buffer = file.readLines()
@@ -149,7 +153,8 @@ fun input(arguments: Arguments) {
             val table = parser(buffer, arguments.delimiter)
             distributionInput(table, arguments.mode, arguments.columns, arguments.outputFile)
         } catch (e : Exception) {
-            println("Invalid format data.")
+            logger.error {"Invalid format data."}
         }
     }
+    logger.info {"program completed"}
 }

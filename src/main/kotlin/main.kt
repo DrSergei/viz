@@ -2,6 +2,7 @@
 import kotlin.system.*
 import cli.*
 import frontend.*
+import kotlin.math.*
 
 fun main(args: Array<String>) {
     try {
@@ -9,8 +10,8 @@ fun main(args: Array<String>) {
             val arguments = prepareArgs(args)
             input(arguments)
         }
-        println("$time")
+        logger.info {"$time"}
     } catch (e: Exception) {
-        println("Fatal error")
+        logger.error { "Fatal error"}
     }
 }
