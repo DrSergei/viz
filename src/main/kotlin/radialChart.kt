@@ -57,7 +57,7 @@ fun saveRadialChart(objects: Vector<String>, vectors: List<Vector<Float>>, outpu
     val renderer = RendererRadialChart(window.layer, objects, vectors)
     val image = renderer.preview()
     val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data!!.bytes)
+    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
 }
 
 

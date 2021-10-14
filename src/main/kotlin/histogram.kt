@@ -35,6 +35,7 @@ fun createWindowHistogram(title: String, objects: Vector<String>, vector: Vector
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
 
+    print(1)
     window.layer.renderer = RendererHistogram(window.layer, objects, vector)
     window.layer.addMouseMotionListener(MouseMotionAdapter)
     window.layer.addMouseListener(MouseAdapter)
@@ -56,7 +57,7 @@ fun saveHistogram(objects: Vector<String>, vector: Vector<Float>, outputFile: St
     val renderer = RendererHistogram(window.layer, objects, vector)
     val image = renderer.preview()
     val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data!!.bytes)
+    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
 }
 
 /**

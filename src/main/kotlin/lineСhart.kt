@@ -56,7 +56,7 @@ fun saveLineChart(objects: Vector<String>, vector: Vector<Float>, outputFile: St
     val renderer = RendererLineChart(window.layer, objects, vector)
     val image = renderer.preview()
     val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data!!.bytes)
+    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
 }
 
 /**

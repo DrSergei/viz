@@ -56,7 +56,7 @@ fun saveScatterPlot(objects: Vector<String>, vectorFirst: Vector<Float>, vectorS
     val renderer = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
     val image = renderer.preview()
     val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data!!.bytes)
+    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
 }
 
 /**

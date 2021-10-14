@@ -57,7 +57,7 @@ fun savePieChart(objects: Vector<String>, vector: Vector<Float>, outputFile: Str
     val renderer = RendererPieChart(window.layer, objects, vector)
     val image = renderer.preview()
     val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data!!.bytes)
+    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
 }
 
 /**

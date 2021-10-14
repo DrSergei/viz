@@ -7,6 +7,7 @@ package frontend
 
 // Импорт.
 import cli.*
+import heartChart.*
 import java.io.*
 import pieChart.*
 import histogram.*
@@ -109,6 +110,16 @@ fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
 }
 
 /**
+ * Служебная функция.
+ *
+ * Обработчик построения гистограммы.
+ */
+fun handlerHeartChart(table: Table, columns: List<Int>, outputFile: String) {
+    createWindowHeartChart("heart")
+    saveHeartChart(outputFile)
+}
+
+/**
  * Таблица методов.
  *
  * Обработчики построения графиков.
@@ -118,7 +129,8 @@ val handlers = mapOf(
     Mode.HISTOGRAM to ::handlerHistogram,
     Mode.LINE_CHART to ::handlerLineChart,
     Mode.SCATTER_PLOT to ::handlerScatterPlot,
-    Mode.RADIAL_CHART to ::handlerRadialChart
+    Mode.RADIAL_CHART to ::handlerRadialChart,
+    Mode.HEART_CHART to ::handlerHeartChart
 )
 
 /**

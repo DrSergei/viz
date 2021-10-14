@@ -31,7 +31,8 @@ enum class Mode {
     HISTOGRAM, // гистограмма
     LINE_CHART, // линейная диаграмма
     SCATTER_PLOT, // точечная диаграмма
-    RADIAL_CHART // радиальная диаграмма
+    RADIAL_CHART, // радиальная диаграмма
+    HEART_CHART // сердечко
 }
 
 /**
