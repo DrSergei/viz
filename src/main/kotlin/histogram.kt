@@ -35,7 +35,6 @@ fun createWindowHistogram(title: String, objects: Vector<String>, vector: Vector
     window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
     window.title = title
 
-    print(1)
     window.layer.renderer = RendererHistogram(window.layer, objects, vector)
     window.layer.addMouseMotionListener(MouseMotionAdapter)
     window.layer.addMouseListener(MouseAdapter)
@@ -85,7 +84,6 @@ class RendererHistogram(private val layer: SkiaLayer, private val objects: Vecto
     private fun paint(number: Int): Paint {
         return Paint().apply {
             color = 0XFF000000.toInt() + Random(number).nextInt() % 0x1000000
-
         }
     }
 

@@ -1,6 +1,13 @@
 import cli.*
 import frontend.*
 import graphics.*
+import histogram.*
+import lineChart.*
+import org.jetbrains.skija.*
+import org.jetbrains.skiko.*
+import pieChart.*
+import radialChart.*
+import scatterPlot.*
 import table.*
 import java.io.*
 import kotlin.test.*
@@ -108,5 +115,64 @@ internal class Testgraphics {
         assertEquals(8.0, distance(-5f, 0f, 3f, 0f).toDouble(), 1e-5)
         assertEquals(5.0, distance(-7f, -8f, -3f, -5f).toDouble(), 1e-5)
     }
+}
 
+internal class TestPieChart {
+
+    @Test
+    fun testpreview() {
+        val table = parser(File("test/data/input.csv").readLines(), ";")
+        val window = SkiaWindow()
+        val image = RendererPieChart(window.layer, table.getObjects(), table.getVector(0)).preview()
+        val test = Image.makeFromEncoded(File("test/image/pie_chart.png").readBytes())
+        assertEquals(image._imageInfo, test._imageInfo)
+    }
+}
+
+internal class Testhistogram {
+
+    @Test
+    fun testpreview() {
+        val table = parser(File("test/data/input.csv").readLines(), ";")
+        val window = SkiaWindow()
+        val image = RendererHistogram(window.layer, table.getObjects(), table.getVector(0)).preview()
+        val test = Image.makeFromEncoded(File("test/image/histogram.png").readBytes())
+        assertEquals(image._imageInfo, test._imageInfo)
+    }
+}
+
+internal class TestlineChart {
+
+    @Test
+    fun testpreview() {
+        val table = parser(File("test/data/input.csv").readLines(), ";")
+        val window = SkiaWindow()
+        val image = RendererLineChart(window.layer, table.getObjects(), table.getVector(0)).preview()
+        val test = Image.makeFromEncoded(File("test/image/line_chart.png").readBytes())
+        assertEquals(image._imageInfo, test._imageInfo)
+    }
+}
+
+internal class TestscatterPlot {
+
+    @Test
+    fun testpreview() {
+        val table = parser(File("test/data/input.csv").readLines(), ";")
+        val window = SkiaWindow()
+        val image = RendererScatterPlot(window.layer, table.getObjects(), table.getVector(0), table.getVector(1)).preview()
+        val test = Image.makeFromEncoded(File("test/image/scatter_plot.png").readBytes())
+        assertEquals(image._imageInfo, test._imageInfo)
+    }
+}
+
+internal class TestradialChart {
+
+    @Test
+    fun testpreview() {
+        val table = parser(File("test/data/input.csv").readLines(), ";")
+        val window = SkiaWindow()
+        val image = RendererRadialChart(window.layer, table.getObjects(), listOf(table.getVector(0), table.getVector(1), table.getVector(2))).preview()
+        val test = Image.makeFromEncoded(File("test/image/radial_chart.png").readBytes())
+        assertEquals(image._imageInfo, test._imageInfo)
+    }
 }
