@@ -6,60 +6,17 @@
 package renderer
 
 // Импорт
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.*
 import org.jetbrains.skija.*
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Font
 import org.jetbrains.skija.Paint
 import org.jetbrains.skiko.*
-import java.awt.*
 import kotlin.math.*
 import kotlin.random.*
 import kotlin.time.*
-import javax.swing.*
 import graphics.*
-import graphics.MouseAdapter
-import graphics.MouseMotionAdapter
 import org.jetbrains.skija.Image
 import table.*
-import java.io.*
-
-/**
- * Функция создания окна.
- *
- * Создает окно с радиальной диаграммой по переданным векторам.
- */
-fun createWindowRadialChart(title: String, objects: Vector<String>, vectors: List<Vector<Float>>) = runBlocking(Dispatchers.Swing) {
-    val window = SkiaWindow()
-    val renderer = RendererRadialChart(window.layer, objects, vectors)
-
-    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-    window.title = title
-
-    window.layer.renderer = renderer
-    window.layer.addMouseMotionListener(MouseMotionAdapter)
-    window.layer.addMouseListener(MouseAdapter)
-    window.preferredSize = Dimension(800, 600)
-    window.minimumSize = Dimension(100, 100)
-    window.pack()
-    window.layer.awaitRedraw()
-    window.isVisible = true
-}
-
-/**
- *  Функция сохранения графика в файл.
- *
- *  Сохраняет радиальную диаграмму в разрешении 800*600 в файл.
- */
-fun saveRadialChart(objects: Vector<String>, vectors: List<Vector<Float>>, outputFile: String) {
-    val window = SkiaWindow()
-    val renderer = RendererRadialChart(window.layer, objects, vectors)
-    val image = renderer.preview()
-    val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
-}
-
 
 /**
  * Класс для рендера.

@@ -11,6 +11,7 @@ import java.io.*
 import renderer.*
 import table.*
 import mu.KotlinLogging
+import org.jetbrains.skiko.*
 
 
 /**
@@ -43,8 +44,11 @@ fun handlerPieChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         val objects = table.getObjects()
-        createWindowPieChart(vector.getHead(), objects, vector)
-        savePieChart(objects, vector, outputFile.split(".").first() + "_$it" + ".png")
+        val window = SkiaWindow()
+        val rendererWindow = RendererPieChart(window.layer, objects, vector)
+        val rendererImage = RendererPieChart(window.layer, objects, vector)
+        saveImage(rendererImage.preview(), outputFile.split(".").first() + "_$it" + ".png")
+        settingWindow(vector.getHead(), window, rendererWindow)
     }
 }
 
@@ -57,8 +61,11 @@ fun handlerHistogram(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         val objects = table.getObjects()
-        createWindowHistogram(vector.getHead(), objects, vector)
-        saveHistogram(objects, vector, outputFile.split(".").first() + "_$it" + ".png")
+        val window = SkiaWindow()
+        val rendererWindow = RendererHistogram(window.layer, objects, vector)
+        val rendererImage = RendererHistogram(window.layer, objects, vector)
+        saveImage(rendererImage.preview(), outputFile.split(".").first() + "_$it" + ".png")
+        settingWindow(vector.getHead(), window, rendererWindow)
     }
 }
 
@@ -71,8 +78,11 @@ fun handlerLineChart(table: Table, columns: List<Int>, outputFile: String) {
     columns.forEach {
         val vector = table.getVector(it)
         val objects = table.getObjects()
-        createWindowLineChart(vector.getHead(), objects, vector)
-        saveLineChart(objects,vector, outputFile.split(".").first() + "_$it" + ".png")
+        val window = SkiaWindow()
+        val rendererWindow = RendererLineChart(window.layer, objects, vector)
+        val rendererImage = RendererLineChart(window.layer, objects, vector)
+        saveImage(rendererImage.preview(), outputFile.split(".").first() + "_$it" + ".png")
+        settingWindow(vector.getHead(), window, rendererWindow)
     }
 }
 
@@ -86,8 +96,11 @@ fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
         val vectorFirst = table.getVector(columns.first())
         val vectorSecond = table.getVector(columns.last())
         val objects = table.getObjects()
-        createWindowScatterPlot(objects.getHead(), objects, vectorFirst, vectorSecond)
-        saveScatterPlot(objects, vectorFirst, vectorSecond, outputFile.split(".").first() + "_${columns.first()}_${columns.last()}" + ".png")
+        val window = SkiaWindow()
+        val rendererWindow = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
+        val rendererImage = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
+        saveImage(rendererImage.preview(), outputFile.split(".").first() + "_${columns.first()}_${columns.last()}" + ".png")
+        settingWindow(objects.getHead(), window, rendererWindow)
     } else
         logger.error {"Too many columns"}
 }
@@ -100,8 +113,11 @@ fun handlerScatterPlot(table: Table, columns: List<Int>, outputFile: String) {
 fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
     val vectors = columns.map { table.getVector(it) }
     val objects = table.getObjects()
-    createWindowRadialChart(objects.getHead(), objects, vectors)
-    saveRadialChart(objects, vectors, outputFile + columns.joinToString("_", "_", "") + ".png")
+    val window = SkiaWindow()
+    val rendererWindow = RendererRadialChart(window.layer, objects, vectors)
+    val rendererImage = RendererRadialChart(window.layer, objects, vectors)
+    saveImage(rendererImage.preview(), outputFile.split(".").first() + columns.joinToString("_", "_", "") + ".png")
+    settingWindow(objects.getHead(), window, rendererWindow)
 }
 
 /**
@@ -110,8 +126,10 @@ fun handlerRadialChart(table: Table, columns: List<Int>, outputFile: String) {
  * Обработчик построения гистограммы.
  */
 fun handlerHeartChart(table: Table, columns: List<Int>, outputFile: String) {
-    createWindowHeartChart("heart")
-    saveHeartChart(outputFile)
+    val window = SkiaWindow()
+    val renderer = RendererHeartChart(window.layer)
+    settingWindow("heart", window, renderer)
+    saveImage(renderer.preview(), outputFile)
 }
 
 /**

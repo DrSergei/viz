@@ -6,54 +6,13 @@
 package renderer
 
 // Импорт
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.*
 import org.jetbrains.skija.*
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Paint
 import org.jetbrains.skiko.*
-import java.awt.*
 import kotlin.time.*
-import javax.swing.*
-import graphics.MouseAdapter
-import graphics.MouseMotionAdapter
 import org.jetbrains.skija.Image
 import java.io.*
-
-/**
- * Функция создания окна.
- *
- * Создает окно с линейной диаграммой по переданному вектору.
- */
-fun createWindowHeartChart(title: String) = runBlocking(Dispatchers.Swing) {
-    val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-    window.title = title
-
-    window.layer.renderer = RendererHeartChart(window.layer)
-    window.layer.addMouseMotionListener(MouseMotionAdapter)
-    window.layer.addMouseListener(MouseAdapter)
-
-    window.maximumSize = Dimension(1024, 768 )
-    window.preferredSize = Dimension(1024, 768 )
-    window.minimumSize = Dimension(1024, 768 )
-    window.pack()
-    window.layer.awaitRedraw()
-    window.isVisible = true
-}
-
-/**
- *  Функция сохранения графика в файл.
- *
- *  Сохраняет линейную диаграмму в разрешении 800*600 в файл.
- */
-fun saveHeartChart(outputFile: String) {
-    val window = SkiaWindow()
-    val renderer = RendererHeartChart(window.layer)
-    val image = renderer.preview()
-    val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
-}
 
 /**
  * Класс для рендера.

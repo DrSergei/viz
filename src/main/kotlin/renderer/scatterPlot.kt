@@ -6,58 +6,17 @@
 package renderer
 
 // Импорт
-import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.*
 import org.jetbrains.skija.*
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Font
 import org.jetbrains.skija.Paint
 import org.jetbrains.skiko.*
-import java.awt.*
 import kotlin.math.*
 import kotlin.random.*
 import kotlin.time.*
-import javax.swing.*
 import graphics.*
-import graphics.MouseAdapter
-import graphics.MouseMotionAdapter
 import org.jetbrains.skija.Image
 import table.*
-import java.io.*
-
-/**
- * Функция создания окна.
- *
- * Создает окно с диаграммой рассеивания по переданным векторам.
- */
-fun createWindowScatterPlot(title: String, objects: Vector<String>, vectorFirst: Vector<Float>, vectorSecond: Vector<Float>) = runBlocking(Dispatchers.Swing) {
-    val window = SkiaWindow()
-    window.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-    window.title = title
-
-    window.layer.renderer = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
-    window.layer.addMouseMotionListener(MouseMotionAdapter)
-    window.layer.addMouseListener(MouseAdapter)
-
-    window.preferredSize = Dimension(800, 600)
-    window.minimumSize = Dimension(100, 100)
-    window.pack()
-    window.layer.awaitRedraw()
-    window.isVisible = true
-}
-
-/**
- *  Функция сохранения графика в файл.
- *
- *  Сохраняет диаграмму рассеивания в разрешении 800*600 в файл.
- */
-fun saveScatterPlot(objects: Vector<String>, vectorFirst: Vector<Float>, vectorSecond: Vector<Float>, outputFile: String) {
-    val window = SkiaWindow()
-    val renderer = RendererScatterPlot(window.layer, objects, vectorFirst, vectorSecond)
-    val image = renderer.preview()
-    val data = image.encodeToData(EncodedImageFormat.PNG)
-    File(outputFile).writeBytes(data?.bytes ?: byteArrayOf())
-}
 
 /**
  * Класс для рендера.
@@ -67,7 +26,7 @@ fun saveScatterPlot(objects: Vector<String>, vectorFirst: Vector<Float>, vectorS
 class RendererScatterPlot(private val layer: SkiaLayer, private val objects: Vector<String>, private val vectorFirst: Vector<Float>, private val vectorSecond: Vector<Float>) : SkiaRenderer {
     // шрифт
     private val typeface = Typeface.makeFromFile("fonts/JetBrainsMono-Regular.ttf")
-    private val font = Font(typeface, 600f / 2 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
+    private val font = Font(typeface, 600f / 3 / objects.data.size - 1) // расчет шрифта для предпочитаемого размера
 
     /**
      * Цвет границ и подписей.
