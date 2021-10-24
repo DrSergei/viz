@@ -1,13 +1,9 @@
 import cli.*
 import frontend.*
 import graphics.*
-import histogram.*
-import lineChart.*
 import org.jetbrains.skija.*
 import org.jetbrains.skiko.*
-import pieChart.*
-import radialChart.*
-import scatterPlot.*
+import renderer.*
 import table.*
 import java.io.*
 import kotlin.test.*

@@ -3,7 +3,7 @@
  *
  * Строит линейные диаграммы.
  */
-package lineChart
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*

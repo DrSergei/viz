@@ -3,7 +3,7 @@
  *
  * Строит круговые диаграммы.
  */
-package pieChart
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*

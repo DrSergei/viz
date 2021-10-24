@@ -3,7 +3,7 @@
  *
  * Строит гистограммы.
  */
-package histogram
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*

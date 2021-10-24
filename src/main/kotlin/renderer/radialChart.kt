@@ -3,7 +3,7 @@
  *
  * Строит радиальные диаграммы.
  */
-package radialChart
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*

@@ -7,13 +7,8 @@ package frontend
 
 // Импорт.
 import cli.*
-import heartChart.*
 import java.io.*
-import pieChart.*
-import histogram.*
-import lineChart.*
-import radialChart.*
-import scatterPlot.*
+import renderer.*
 import table.*
 import mu.KotlinLogging
 

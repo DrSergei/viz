@@ -3,7 +3,7 @@
  *
  * Строит линейные диаграммы.
  */
-package heartChart
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*

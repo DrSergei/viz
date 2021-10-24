@@ -3,7 +3,7 @@
  *
  * Строит диаграммы рассеивания.
  */
-package scatterPlot
+package renderer
 
 // Импорт
 import kotlinx.coroutines.*
